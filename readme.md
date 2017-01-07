@@ -93,25 +93,25 @@ while True:
 
 ### Be able to turn the relay on at a defined time for a period of time (eg. at 3pm for 20 mins). Stop scripts from stomping on each other.
 
-Thoughts:
+#### Thoughts:
 
-System
+**System**
 - Set up a cronjob to run every `n` mins.
 
-Ruby (scheduling, APIs)
+**Ruby** (scheduling, APIs)
 - Get `Time.now.hour` and `Time.now.min` using Ruby.
 - If `Hour` and `Min` are within a target range at the time of checking, run a python script.
 
-Python
+**Python**
 - Run an `on` script for a `period` of time. This would run for n minutes and then turn off. Eventually, I could probably set `n` using the duration of a google calendar item.
 - Close the script and python.
 
-System
+**System**
 - Restart
 
 This would let me run most of the logic in ruby and only dive into Python when I need to toggle the systems on or off.
 
-Report:
+#### Report:
 
 Got this working quite easily and much like the above.
 
@@ -121,7 +121,7 @@ Apart from disconnecting the power, the only solution to the issue is to run a r
 
 Another issue I've come across is that while the script seems to work all of the time, occasionally, the solenoid does not work. I'm not sure what could be causing this. It's either that the relay is not closing properly or that the solenoid isn't working. Potentially this could be to do with the mechanical components within the solenoid not making contact correctly, and therefore the solenoid circut not being completed. Strangely it does not happen every time though.
 
-#### 4:56pm, 7 Jan, 2017
+##### 4:56pm, 7 Jan, 2017
 
 **Success**. After assembling the solenoids, pi and watering systems, rewiring my shed with additional ethernet cables and bashing a hole through the tin side of my shed with a back-hoe, I've had my first successful test firing. I've been able to control the flow of water in my back garden safely using the internet! What a time to be alive. The joy, the wonder. Amaze.
 
