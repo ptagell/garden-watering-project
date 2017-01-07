@@ -35,7 +35,7 @@ From a hardware perspective, I'm feeling pretty confident. Plug the things toget
 
 Software is where it seems like there is more complexity, so I'm writing out these as somewhat logical steps to follow in this project.
 
-- X] Be able to turn on and off the relay using a switch.
+- [X] Be able to turn on and off the relay using a switch.
 - [X] Be able to turn on and off the relay using a script, keeping it on for a few seconds, then turning it off.
 - [X] Be able to turn the relay on for a period of minutes, then off again.
 - [X] Be able to turn the relay on at a defined time for a period of time (eg. at 3pm for 20 mins). Stop scripts from stomping on each other.
