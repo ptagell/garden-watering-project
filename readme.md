@@ -110,3 +110,13 @@ System
 - Restart
 
 This would let me run most of the logic in ruby and only dive into Python when I need to toggle the systems on or off.
+
+Report:
+
+Got this working quite easily and much like the above.
+
+I did run into a small issue whereby the Seed grove that I was using the control the relay would error and display a red RST light. Reading on the forums this is a relatively common issue with the board.
+
+Apart from disconnecting the power, the only solution to the issue is to run a reset command for the board, which I've now put into a seperate ruby script so I can run it when I need to.
+
+Another issue I've come across is that while the script seems to work all of the time, occasionally, the solenoid does not work. I'm not sure what could be causing this. It's either that the relay is not closing properly or that the solenoid isn't working. Potentially this could be to do with the mechanical components within the solenoid not making contact correctly, and therefore the solenoid circut not being completed. Strangely it does not happen every time though.
