@@ -6,27 +6,23 @@ I'm not an early riser.
 
 So, to overcome these things I've put together this series of scripts to control two solenoids (starting with one) on a timer using:
 
-* Raspberry Pi
-* Seeed Grove Pi sensor board
-* Seeed relay
-* Some 25mm solenoids
-* A 240 > 24V transformer (this is the bit that worries me)
-* Some garden safe sprinkler system automation wire.
+* [Raspberry Pi](https://littlebirdelectronics.com.au/products/raspberry-pi-2-model-b-1)
+* [GrovePi+ board](https://www.dexterindustries.com/shop/grovepi-board/)
+* [Seeed Studio Grove relay](https://www.seeedstudio.com/Grove-Relay-p-769.html)
+* [Some 25mm solenoids](https://www.bunnings.com.au/k-rain-solenoid-valve_p3120237)
+* [A 240 > 24V transformer](https://www.jaycar.us/mains-adaptor-24vac-1a-unregulated-bare-ends/p/MP3032) (this is the bit that worries me)
+* Some [7 core irrigation wire](https://www.bunnings.com.au/toro-10m-7-core-irrigation-wire_p3110720).
+* Existing watering system (made primarily with [19mm PVC poly pieces](https://www.bunnings.com.au/search/products?q=19mm%20poly))
 
 ## Challenges
 
 As I see it, there are a few challenges I will face in this project.
 
-1. Not that familiar with Python.
-
+* **Not that familiar with Python.**
 Everything to do with IoT seems to be in Python. I have more experience in Ruby so this could trip me up.
-
-2. Not that familiar with electricity...and electricity and water don't mix.
-
+* **Not that familiar with electricity...and electricity and water don't mix.**
 Seems obious.
-
-3. Learning raspberry pi.
-
+* **Learning raspberry pi.**
 Hurrah. In we go.
 
 ## Method
