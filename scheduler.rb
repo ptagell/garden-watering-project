@@ -1,4 +1,4 @@
-
+#!/usr/bin/env ruby
 
 # Specify a start time as the hour of the day (eg. 17 = 5pm)
 start_time_hour = 20
