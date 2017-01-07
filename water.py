@@ -15,7 +15,7 @@ print ("Turning on the water")
 grovepi.digitalWrite(relay,1)
 grovepi.digitalWrite(led,1)
 print ("Water is on")
-time.sleep(10) # This is the duration of watering in minutes.
+time.sleep(100) # This is the duration of watering in minutes.
 
 # switch off for 5 seconds
 print ("Ending...turning off water")

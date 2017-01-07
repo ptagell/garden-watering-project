@@ -1,7 +1,7 @@
 
 
 # Specify a start time as the hour of the day (eg. 17 = 5pm)
-start_time_hour = 14
+start_time_hour = 17
 
 # Find current time.
 current_time = Time.now.hour

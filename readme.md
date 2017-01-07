@@ -38,7 +38,7 @@ Software is where it seems like there is more complexity, so I'm writing out the
 [X] Be able to turn on and off the relay using a switch.
 [X] Be able to turn on and off the relay using a script, keeping it on for a few seconds, then turning it off.
 [X] Be able to turn the relay on for a period of minutes, then off again.
-[ ] Be able to turn the relay on at a defined time for a period of time (eg. at 3pm for 20 mins). Stop scripts from stomping on each other.
+[X] Be able to turn the relay on at a defined time for a period of time (eg. at 3pm for 20 mins). Stop scripts from stomping on each other.
 [ ] Be able to do the same thing with more than one system.
 [ ] Integrate my timing with Google Calendar to use that to turn on and off the system using named calendar events.
 [ ] Deliver push notifications to my phone when watering is started, stopped or if there is an error.
@@ -120,3 +120,13 @@ I did run into a small issue whereby the Seed grove that I was using the control
 Apart from disconnecting the power, the only solution to the issue is to run a reset command for the board, which I've now put into a seperate ruby script so I can run it when I need to.
 
 Another issue I've come across is that while the script seems to work all of the time, occasionally, the solenoid does not work. I'm not sure what could be causing this. It's either that the relay is not closing properly or that the solenoid isn't working. Potentially this could be to do with the mechanical components within the solenoid not making contact correctly, and therefore the solenoid circut not being completed. Strangely it does not happen every time though.
+
+#### 4:56pm, 7 Jan, 2017
+
+**Success**. After assembling the solenoids, pi and watering systems and bashing a hole through the tin side of my shed with a back-hoe, I've had my first successful test firing. I've been able to control the flow of water in my back garden safely using the internet! What a time to be alive. The joy, the wonder. Amaze.
+
+The issue I found before whereby the solenoid would not fire has also seemingly resolved itself. Perhaps the solenoids work differently under pressure from the water than they do without this. Interesting.
+
+My script also checks the time correctly in production, which is great.
+
+My first trial only includes a single bed and I need one more relay before I can move onto the second step - controlling more than one zone. It's all wired up though, so should just be a question of ordering a few more relays (I suspect I want to move onto my garden lights next). I suspect the limiting factor for my beds will end up being water pressure. I also may need additional zones to cater to the fact that some plants need more water (usually vegetables) and some less (usually flowers and natives).  
