@@ -21,7 +21,7 @@ As I see it, there are a few challenges I will face in this project.
 * **Not that familiar with Python.**
 Everything to do with IoT seems to be in Python. I have more experience in Ruby so this could trip me up.
 * **Not that familiar with electricity...and electricity and water don't mix.**
-Seems obious.
+Seems obvious.
 * **Learning raspberry pi.**
 Hurrah. In we go.
 
