@@ -227,7 +227,6 @@ The crontab is pretty simple. Every hour, at 5 minutes past the hour, run the `s
 
 ```
 5 * * * *  ruby /home/pi/Projects/garden/scheduler.rb 1800 >> /tmp/cron_output
-
 ```
 
 Eventually I'll need to expand this to allow for more parameters - for example, zones (-z) or time (-t).
