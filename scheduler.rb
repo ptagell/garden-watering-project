@@ -12,7 +12,7 @@ current_time_local = current_time_utc.localtime.hour
 puts "Current UTC time is "+current_time_utc.to_s
 puts "Current time hour is "+current_time_local.to_s
 #Specify a local start time in 24 hour time (eg. 2pm is the 14th hour of the day)
-start_time_hour = 5
+start_time_hour = 6
 # Output the start time to logs or terminal
 puts "Start time hour is "+start_time_hour.to_s
 

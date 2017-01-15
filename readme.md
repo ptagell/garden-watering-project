@@ -223,10 +223,11 @@ Apart from disconnecting the power, the only solution to the issue is to run a r
 
 Another issue I've come across is that while the script seems to work all of the time, occasionally, the solenoid does not work. I'm not sure what could be causing this. It's either that the relay is not closing properly or that the solenoid isn't working. Potentially this could be to do with the mechanical components within the solenoid not making contact correctly, and therefore the solenoid circuit not being completed. Strangely it does not happen every time though.
 
-The crontab is pretty simple. Every hour, on the hour, run the `schedule.rb` file. If the hour is correct, run the `water.py` script for the length of time provided in the original command parameter.
+The crontab is pretty simple. Every hour, at 5 minutes past the hour, run the `schedule.rb` file. If the hour is correct, run the `water.py` script for the length of time provided in the original command parameter (in this case, 1800 seconds, or 30 minutes).
 
 ```
-0 * * * *  ruby /home/pi/Projects/garden/scheduler.rb 180 >> /tmp/cron_output
+5 * * * *  ruby /home/pi/Projects/garden/scheduler.rb 1800 >> /tmp/cron_output
+
 ```
 
 Eventually I'll need to expand this to allow for more parameters - for example, zones (-z) or time (-t).
