@@ -22,12 +22,70 @@ So, to overcome these things I've put together this series of scripts to control
 * [Some 25mm solenoids](https://www.bunnings.com.au/k-rain-solenoid-valve_p3120237)
 * [A 240 > 24V transformer](https://www.jaycar.us/mains-adaptor-24vac-1a-unregulated-bare-ends/p/MP3032) (this is the bit that worries me)
 * Some [7 core irrigation wire](https://www.bunnings.com.au/toro-10m-7-core-irrigation-wire_p3110720).
+* [Irrigation wire connectors](https://www.bunnings.com.au/holman-wire-cable-irrigation-connectors-10-pack_p3119565)
 * Existing watering system (made primarily with [19mm PVC poly pieces](https://www.bunnings.com.au/search/products?q=19mm%20poly))
 * [Pope 25mm 3 outlet manifold](https://www.bunnings.com.au/pope-25mm-3-outlet-manifold_p3120691)
-* 3 x lengths of BSP pipe
+* 3 x lengths of rigid BSP pipe (thicker, solid pipe with male threaded ends)
 * [Assorted BSP 1" bits and pieces](https://www.bunnings.com.au/search/products?q=bsp%20pipe%201%22) - I would recommend staying away from the "[nut and tail](https://www.bunnings.com.au/pope-25mm-poly-nut-and-tail_p3123863)" type joins as they seem quite hard to get to stop leaking. 
 
+
+
+# Plumbing
+
+The plumbing setup is quite simple. 
+
 ![Map of plumbing and wiring](files/wiring.png)
+
+Using my existing watering system, essentially my goal was to create an intelligent hub through which the water flowed when I wanted to. 
+
+To do this, the mains water goes into the manifold, where it is then stopped by the solenoids. When the solenoid is opened by the relays attached to the RPi, the water flows. By default, the relays are closed and take electric current to keep them open. This works for me because it means that in the event of a power-failure I won't flood my house. 
+
+Although I felt quite confident about the plumbing side of things, one of the things I learnt through this process is that it's actually really hard to do plumbing if you care about slow drips. Also important is to consider that this is one of the few projects where you're combining water and electricity - two things that shouldn't really meet unless you're interested in entering the Darwin awards. 
+
+![In order to avoid the Darwin awards, I put the solenoids in a box to contain any water explosions and splashes](/files/solioids-in-box.jpg)
+
+My first attempt at building out the manifold used 19mm Poly pipes and joiners to connect things. This didn't work so well and burst just before I proudly demonstrated my new fool-proof internet-powered garden watering system to [Andy Carson](http://github.com/arcarson). The mains water pressure was too much for the plastic clips I used.
+
+![Attempt 1: Manifold made with Poly pipe](files/poly-pipe-manifold.png)
+
+To solve this, I decided to replace the entire manifold and feeder system with more study rigid BSP pipes and screw-tightened clips wherever I moved into poly pipe. 
+
+![Attempt 2: Proper PVC manifold and BSP threaded joiners](files/pvc-manifold.jpg)
+
+Here you can see all the pieces assembled and in their box in preparation for going into my shed. 
+
+![All the pieces in one place before going into the shed](/files/all-the-pieces.jpg)
+
+Once I put this in, I found that there was then an issue with the "Nut and Tail" joints I'd used at the end of the BSP. They leaked - I even cracked one hand tightening it.
+
+![Avoid these Nut and tail joints if you can](/files/nut-and-tail.jpg)
+
+ This is because it's difficult to get a tight enough seal as the joint is made in two pieces with a washer. I solved this buy replacing the Nut and tail with a BSP female threaded joint and one piece 19mm reducers. 
+
+![The final inlet/outlet pipe joins showing metal clips and one piece solid reducers](files/bsp-connectors.jpg)
+
+# Electronics
+
+From an electronics perspective, it took me a while to figure out what was needed. Thanks to by Grove Pi kit, I had a relay, but just no real idea how to use it. Also no idea how to avoid electrocute myself.
+
+Enter many hours of youtube research and videos. 
+
+Through this research I found that I'd need to do the following: 
+
+![Map of electronics used](files/electronics.png)
+
+1. Connect the black wire to one of the cables from each solenoid (they have two each) and also to the transformer. This is the "power wire" and provides one half of the circuit needed to turn on the solenoid. 
+2. The second wire (I chose red and white (shown as yellow) provides the "control" wire. 
+3. The "control" wire is fed through the relay and then back to the second wire from the transformer. This way, when the relay is activated, the circuit is completed and the solenoid is able to activate (allowing water to flow). 
+
+Because water is being used in close proximity to electricity here, I wouldn't recommend doing this unless you felt pretty confident in your knowledge. There are a few things I did to keep myself safe. 
+
+1. _Most importantly:_ I did not plug in the transformer until I was sure there were no exposed wires
+2. I made sure that I put electrical tape over the ends of any exposed wires before I plugged anything in. 
+3. The transformer I used for this project takes the 240VAC (240 Volts Alternating Current) found in an Australian powerpoint and drops it down to 24VAC. This is a much lower voltage (garden lights use 12VAC so that you don't die if you cut through a wire), but I'd prefer to be safer than sorry. Supposedly a 24V current can kill you if it gets under your skin. 
+4. I put the solenoids (which were the piece most likely to come into direct contact with water) were inside a plastic tub. This way, if the solenoid failed or there was a leak, water wouldn't spay all over my shed, and would just dribble over the floor (turned out this safety feature was used :-) ).
+5. I ended up using these nifty [little waterproof wire connectors](https://www.bunnings.com.au/holman-wire-cable-irrigation-connectors-10-pack_p3119565). They are one used only, but flood themselves with a gel when used to create a water proof seal on the wires. This is important as although the solenoids _shouldn't_ get wet when they're being used, as I found when I flooded mine, they can sometimes. 
+
 
 # Code
 
@@ -45,9 +103,6 @@ Hurrah. In we go.
 
 ## Method & Progress
 
-From a hardware perspective, I'm feeling pretty confident. Plug the things together in a circuit and then plumb in the solenoids to the existing pipes.
-
-**Update**: This was completely wrong. Plumbing is hard when you care about saving water and removing leaks. It's actually really difficult to get cheap poly pipes, solenoids and valves under pressure not to leak. See the [plumbing section](#plumbing) for more info about this.
 
 Software is where it seems like there is more complexity, so I'm writing out these as somewhat logical steps to follow in this project.
 
@@ -157,7 +212,7 @@ My first trial only includes a single bed and I need one more relay before I can
 
 ### Disaster strikes
 
-Just before leaving, I was showing @andryorwss went to look at the system and found that the three way manifold I'd created from poly pipe (leading from the mains and to the solenoids) had failed. This was due to the fact that the hoses before the manifold had popped off the valve due to the mains pressure. I was very glad this happened as it showed that my initial plumbing design had been flawed...if it hadn't failed when it did, my shed would've become even more flooded (the plastic box well and was overflowing with water when I found it).
+Just before leaving, I was showing [@arcarson](http://github.com.au/arcarson) went to look at the system and found that the three way manifold I'd created from poly pipe (leading from the mains and to the solenoids) had failed. This was due to the fact that the hoses before the manifold had popped off the valve due to the mains pressure. I was very glad this happened as it showed that my initial plumbing design had been flawed...if it hadn't failed when it did, my shed would've become even more flooded (the plastic box well and was overflowing with water when I found it).
 
 I replaced the failed-manifold with one that was far better constructed, as well as the various connectors. This added $100 to the cost, but now I'm relatively confident that it won't burst again. I just need to remember to drain the irrigation system before winter sets in (and the pipes potentially freeze).
 
