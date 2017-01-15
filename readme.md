@@ -1,5 +1,12 @@
 # Readme
 
+* [Overview](#overview)
+* [Plumbing details](#plumbingdetails)
+* [Code snippets](#codesnippets)
+* [Working method](#workingmethod)
+
+## Overview
+
 A simple project to automate my home watering. I already have a quite extensive system of pipes and such set up to water my plants. The problem is that from what I've been reading it's best to water plants low and slow in the morning under mulch, rather than high and fast in the evening with a beer and hose. This is better for the plants from a mildew perspective and also conservse moisture as, if I water just before dawn, it will get a chance to soak in and get to the roots before the sun is high.
 
 I'm not an early riser.
