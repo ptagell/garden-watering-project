@@ -3,7 +3,7 @@
 * [Overview](#overview)
 * [Plumbing details](#plumbingdetails)
 * [Code snippets](#codesnippets)
-* [Working method](#workingmethod)
+* [Method](#method)
 
 ## Overview
 
@@ -21,7 +21,7 @@ So, to overcome these things I've put together this series of scripts to control
 * Some [7 core irrigation wire](https://www.bunnings.com.au/toro-10m-7-core-irrigation-wire_p3110720).
 * Existing watering system (made primarily with [19mm PVC poly pieces](https://www.bunnings.com.au/search/products?q=19mm%20poly))
 
-## Challenges
+### Challenges
 
 As I see it, there are a few challenges I will face in this project.
 
@@ -32,9 +32,9 @@ Seems obvious.
 * **Learning raspberry pi.**
 Hurrah. In we go.
 
-## Method
+## Method & Progress
 
-From a hardware perspective, I'm feeling pretty confident. Plug the things together in a circut and then plumb in the solenoids to the existing pipes.
+From a hardware perspective, I'm feeling pretty confident. Plug the things together in a circuit and then plumb in the solenoids to the existing pipes.
 
 Software is where it seems like there is more complexity, so I'm writing out these as somewhat logical steps to follow in this project.
 
