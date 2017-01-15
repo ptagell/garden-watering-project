@@ -8,8 +8,9 @@ import grovepi
 # Connect the Grove Relay to digital port D5. LED to D8
 # SIG,NC,VCC,GND
 relay = 5
-# Specify the duration of watering in seconds
+# Specify the duration of watering in seconds.
 duration_of_watering_in_seconds = 120
+# Convert the watering duration value to a float as expected per sleep function.
 duration_of_watering_as_float = float(duration_of_watering_in_seconds)
 
 grovepi.pinMode(relay,"OUTPUT")
@@ -22,7 +23,8 @@ print ("Water is on")
 # This is the duration of watering in seconds.
 time.sleep(duration_of_watering_as_float)
 
-# switch off for 5 seconds
-print ("Ending...turning off water")
+
+print ("Ending...trying to turning off water")
+# Turn the relay off.
 grovepi.digitalWrite(relay,0)
 print ("Water is off")
