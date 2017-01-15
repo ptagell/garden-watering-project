@@ -1,16 +1,14 @@
 # Readme
 
 * [Overview](#overview)
-* [Code](#code)
-** [Code snippets](#codesnippets)
 * [Plumbing](#plumbing)
-** [Code snippets](#codesnippets)
-* [Progress diary](#progress-diary)
+* [Electronics](#electronics)
+* [Code](#code)
 * [Ideas](#ideas)
 
-## Overview
+# Overview
 
-A simple project to automate my home watering. I already have a quite extensive system of pipes and such set up to water my plants. The problem is that from what I've been reading it's best to water plants low and slow in the morning under mulch, rather than high and fast in the evening with a beer and hose. This is better for the plants from a mildew perspective and also conserve moisture as, if I water just before dawn, it will get a chance to soak in and get to the roots before the sun is high.
+A simple project to automate my home watering. I already have a quite extensive system of pipes and such set up to water my plants. The problem is that from what I've been reading it's best to water plants low and slow in the morning under mulch, rather than high and fast in the evening with a beer and hose. This is better for the plants from a mildew and fungal perspective and also conserve moisture as, if I water just before dawn, it will get a chance to soak in and get to the roots before the sun is high.
 
 I'm not an early riser.
 
@@ -28,7 +26,21 @@ So, to overcome these things I've put together this series of scripts to control
 * 3 x lengths of rigid BSP pipe (thicker, solid pipe with male threaded ends)
 * [Assorted BSP 1" bits and pieces](https://www.bunnings.com.au/search/products?q=bsp%20pipe%201%22) - I would recommend staying away from the "[nut and tail](https://www.bunnings.com.au/pope-25mm-poly-nut-and-tail_p3123863)" type joins as they seem quite hard to get to stop leaking. 
 
+I should also point out that I've found lots of great projects online which tackle this problem in similar ways. [Open Sprinkler Pi](https://opensprinkler.com/product/opensprinkler-pi/) really took my fancy, but I realised that because I already had a Pi and Grove, I didn't really need to buy a seperate controller. 
 
+**If you're considering this yourself, a word of warning**
+
+This probably won't save you money. 
+
+It may not even save your garden. 
+
+For me, excluding the cost of the Pi and Grove (which I already had) the total cost of this experiment has probably been about $180AUD allowing $150 for plumbing supplies, $30 for additional power boards, ethernet cables etc.  This actually isn't insane given that it will easily cost [about $100](https://www.bunnings.com.au/search/products?facets=CategoryIdPath%3D2a021706-07d5-4648-bf26-2ea8fea049df%20%3E%2001f69b03-7098-42c3-b3c2-0a3c184efb7c%20%3E%20e5264067-f17e-4981-9c75-26549d354caa%20%3E%2042eb706d-7dc4-4acb-af34-f13db5f9c46a%20%3E%201cd2c5bb-f801-4add-bb56-6a7e8e76dce7) to buy a controller at your hardware shop and then you'll have to hand over more for solenoids, pipes, wires etc. 
+
+For me, the most important thing I've learnt through this project is the _consequences actions can have when you move from the digital world into the real world_. Most web developers and designers play in a world where the worst that can happen to them personally as a result of a failure in their decisions is that they get less conversions on a transactions, or their site goes offline for a few hours. In this project, making a mistake could cost me my garden (which could die or be drowned) or damage the foundations of my house (if the manifold or pipes burst and spew water out, underneath my house, for days while I'm away from home). 
+
+Still, I'd recommend this regardless. It's been great fun. I hope this helps you automate your own garden. 
+
+This document is broken into four sections for easy reference, and the code is really simple. I'll try and keep the software concerns seperate as I build this project out over time so you can pick it up and use what you need without needing to understand lots of complicated code. I'll also try and remember to comment lots so it's easy to understand. Thank you to all the other open source projects that do this also! It's only because of the forethought and generosity of time others have given that I've been able to learn how to do any of this.  
 
 # Plumbing
 
@@ -42,13 +54,13 @@ To do this, the mains water goes into the manifold, where it is then stopped by 
 
 Although I felt quite confident about the plumbing side of things, one of the things I learnt through this process is that it's actually really hard to do plumbing if you care about slow drips. Also important is to consider that this is one of the few projects where you're combining water and electricity - two things that shouldn't really meet unless you're interested in entering the Darwin awards. 
 
-![In order to avoid the Darwin awards, I put the solenoids in a box to contain any water explosions and splashes](/files/solioids-in-box.jpg)
+![In order to avoid the Darwin awards, I put the solenoids in a box to contain any water explosions and splashes](/files/solenoids-in-box.jpg)
 
 My first attempt at building out the manifold used 19mm Poly pipes and joiners to connect things. This didn't work so well and burst just before I proudly demonstrated my new fool-proof internet-powered garden watering system to [Andy Carson](http://github.com/arcarson). The mains water pressure was too much for the plastic clips I used.
 
 ![Attempt 1: Manifold made with Poly pipe](files/poly-pipe-manifold.png)
 
-To solve this, I decided to replace the entire manifold and feeder system with more study rigid BSP pipes and screw-tightened clips wherever I moved into poly pipe. 
+To solve this, I decided to replace the entire manifold and feeder system with more study rigid BSP pipes and [steel screw-tightened clips](https://www.bunnings.com.au/kinetic-11-25mm-304-stainless-steel-hose-clamps_p4920192) wherever I moved into poly pipe. 
 
 ![Attempt 2: Proper PVC manifold and BSP threaded joiners](files/pvc-manifold.jpg)
 
@@ -63,6 +75,8 @@ Once I put this in, I found that there was then an issue with the "Nut and Tail"
  This is because it's difficult to get a tight enough seal as the joint is made in two pieces with a washer. I solved this buy replacing the Nut and tail with a BSP female threaded joint and one piece 19mm reducers. 
 
 ![The final inlet/outlet pipe joins showing metal clips and one piece solid reducers](files/bsp-connectors.jpg)
+
+Once I had this all assembled, I set up a `cron` job to trigger my watering system on and off for a minute at a time in order to pressure test and rock/jerk the system around a bit. Turning water one and off with a solenoid is quite a violent process (you'll hear it - there is quite a bit of pressure involved in mains water) and I think this is what caused my first iteration to fail. Turning it on and off rapidly means you get to i) see if it leaks and ii) hopefully accelerate any failure so you can fix it before you come to rely on it working properly.
 
 # Electronics
 
@@ -86,12 +100,24 @@ Because water is being used in close proximity to electricity here, I wouldn't r
 4. I put the solenoids (which were the piece most likely to come into direct contact with water) were inside a plastic tub. This way, if the solenoid failed or there was a leak, water wouldn't spay all over my shed, and would just dribble over the floor (turned out this safety feature was used :-) ).
 5. I ended up using these nifty [little waterproof wire connectors](https://www.bunnings.com.au/holman-wire-cable-irrigation-connectors-10-pack_p3119565). They are one used only, but flood themselves with a gel when used to create a water proof seal on the wires. This is important as although the solenoids _shouldn't_ get wet when they're being used, as I found when I flooded mine, they can sometimes. 
 
+With all this in mind, I ended up with a situation like this.
+
+![Brain Box](files/brain-box.jpg)
+
+Here you can see: 
+
+1. Raspberry Pi and Grove Pi board on left inside green box. 
+2. Input compartment bottom right for 7 core irrigation wire. 
+3. First relay connected in it's own compartment (white wires)
+4. Wires taped waiting for second relay to arrive from [Little Bird Electronics](https://littlebirdelectronics.com.au).
+5.  Temperature/humidity sensor top right (for a [seperate project](http://tagell.com/projects/kyneton-temperature-logger/))
+6.  Holes for ethernet and USB-power to come into the green box to power and control the Raspberry Pi. 
 
 # Code
 
 ## Challenges
 
-As I see it, there are a few challenges I will face in this project.
+For me there were are a few challenges I have/will faced in this project.
 
 * **Not that familiar with Python.**
 Everything to do with IoT seems to be in Python. I have more experience in Ruby so this could trip me up.
@@ -100,23 +126,22 @@ Seems obvious.
 * **Learning raspberry pi.**
 Hurrah. In we go.
 
-
 ## Method & Progress
 
-
-Software is where it seems like there is more complexity, so I'm writing out these as somewhat logical steps to follow in this project.
+To help myself overcome some of these issues, I've broken the challenge down into some smaller steps to knock over one at a time. I'll keep this list updated as I go. 
 
 - [X] Be able to turn on and off the relay using a switch.
 - [X] Be able to turn on and off the relay using a script, keeping it on for a few seconds, then turning it off.
 - [X] Be able to turn the relay on for a period of minutes, then off again.
 - [X] Be able to turn the relay on at a defined time for a period of time (eg. at 3pm for 20 mins). Stop scripts from stomping on each other.
 - [ ] Be able to do the same thing with more than one system.
-- [ ] Integrate my timing with Google Calendar to use that to turn on and off the system using named calendar events.
-- [ ] Deliver push notifications to my phone when watering is started, stopped or if there is an error.
+- [ ] Be able to reliably start and stop smaller watering jobs (eg. 10 minute watering session) via my mobile phone - I currently use SimpleSSH for iOS but am keen to give [Prompt2](https://panic.com/prompt/) a go. 
+- [ ] MAYBE: Integrate with a home assistant so that I can verbally say "water my garden for `n` minutes" and actually have that work...because we live in the future (also gives me a good reason to buy said assistant)
+- [ ] MAYBE: Integrate my timing with Google Calendar to use that to turn on and off the system using named calendar events.
+- [ ] MAYBE: Deliver push notifications to my phone when watering is started, stopped or if there is an error.
 
 
-
-# Progress diary
+# Code progress diary
 
 ## 6th Jan, 2017. 
 
