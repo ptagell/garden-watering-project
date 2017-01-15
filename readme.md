@@ -56,7 +56,7 @@ Although I felt quite confident about the plumbing side of things, one of the th
 
 ![In order to avoid the Darwin awards, I put the solenoids in a box to contain any water explosions and splashes](/files/solenoids-in-box.jpg)
 
-My first attempt at building out the manifold used 19mm Poly pipes and joiners to connect things. This didn't work so well and burst just before I proudly demonstrated my new fool-proof internet-powered garden watering system to [Andy Carson](http://github.com/arcarson). The mains water pressure was too much for the plastic clips I used.
+My first attempt at building out the manifold used 19mm Poly pipes and joiners to connect things. This didn't work so well and burst just before I proudly demonstrated my new fool-proof internet-powered garden watering system to [Andy Carson](https://github.com/arcarson). The mains water pressure was too much for the plastic clips I used.
 
 ![Attempt 1: Manifold made with Poly pipe](files/poly-pipe-manifold.png)
 
@@ -68,7 +68,7 @@ Here you can see all the pieces assembled and in their box in preparation for go
 
 ![All the pieces in one place before going into the shed](/files/all-the-pieces.jpg)
 
-Once I put this in, I found that there was then an issue with the "Nut and Tail" joints I'd used at the end of the BSP. They leaked - I even cracked one hand tightening it.
+Once I put this in, I found that there was then an issue with the "Nut and Tail" joints I'd used at the end of the BSP. They leaked - I even cracked the plastic on one hand-tightening it so it wasn't going to last long. In the picture below you can see the failed unit on the bottom, and the replacement on the top.
 
 ![Avoid these Nut and tail joints if you can](/files/nut-and-tail.jpg)
 
@@ -237,7 +237,7 @@ My first trial only includes a single bed and I need one more relay before I can
 
 ### Disaster strikes
 
-Just before leaving, I was showing [@arcarson](http://github.com.au/arcarson) went to look at the system and found that the three way manifold I'd created from poly pipe (leading from the mains and to the solenoids) had failed. This was due to the fact that the hoses before the manifold had popped off the valve due to the mains pressure. I was very glad this happened as it showed that my initial plumbing design had been flawed...if it hadn't failed when it did, my shed would've become even more flooded (the plastic box well and was overflowing with water when I found it).
+Just before leaving, I was showing [@arcarson](https://github.com/arcarson) went to look at the system and found that the three way manifold I'd created from poly pipe (leading from the mains and to the solenoids) had failed. This was due to the fact that the hoses before the manifold had popped off the valve due to the mains pressure. I was very glad this happened as it showed that my initial plumbing design had been flawed...if it hadn't failed when it did, my shed would've become even more flooded (the plastic box well and was overflowing with water when I found it).
 
 I replaced the failed-manifold with one that was far better constructed, as well as the various connectors. This added $100 to the cost, but now I'm relatively confident that it won't burst again. I just need to remember to drain the irrigation system before winter sets in (and the pipes potentially freeze).
 

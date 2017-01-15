@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Code to specifically turn off the watering system in the event the "Off" code does not work using Python. 
+
 import time
 import grovepi
 

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# Test Python Script to water the garden for 1 minute.
+# Note: I need to solve an issue whereby using SimpleSSH the system does not turn off using this code. 
+
 import time
 import grovepi
 

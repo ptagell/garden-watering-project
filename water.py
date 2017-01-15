@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 
+# Primary watering controller. Waters the garden for the duration_of_watering specified (in seconds)
+
 import time
 import grovepi
 
 # Connect the Grove Relay to digital port D5. LED to D8
 # SIG,NC,VCC,GND
 relay = 5
+duration_of_watering = 120
 
 grovepi.pinMode(relay,"OUTPUT")
 
@@ -13,7 +16,7 @@ grovepi.pinMode(relay,"OUTPUT")
 print ("Turning on the water")
 grovepi.digitalWrite(relay,1)
 print ("Water is on")
-time.sleep(3600) # This is the duration of watering in seconds.
+time.sleep(duration_of_watering) # This is the duration of watering in seconds.
 
 # switch off for 5 seconds
 print ("Ending...turning off water")
