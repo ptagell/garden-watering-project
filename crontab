@@ -1,1 +1,1 @@
-5 5 * * *  ruby /home/pi/Projects/garden/scheduler.rb 1800 >> /tmp/cron_output
+5 5 * * *  export PATH=/opt/rbenv/shims:/opt/rbenv/bin:/usr/bin:$PATH; eval "$(rbenv init -)"; ruby /home/pi/Projects/garden/scheduler.rb 1800 >> /tmp/cron_output

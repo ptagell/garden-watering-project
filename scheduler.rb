@@ -29,7 +29,7 @@ puts "Current time hour is "+current_time_local.to_s
 
 # I stumbled across an issue whereby the GrovePi would need resetting (RST light woudl activate). This line resets the GrovePi before trying to run any commands with it. Important to do it before each watering session to increase the chances it doesn't fail during the watering session (and keep watering...watering...watering)
 puts Time.now.to_s+" Reset grove to clear warnings"
-# system("avrdude -c gpio -p m328p")
+system("avrdude -c gpio -p m328p")
 puts Time.now.to_s+" Grove Reset"
 
 # Turn on the watering system using the Python controller code for the Grove Relay.
@@ -37,8 +37,7 @@ puts Time.now.to_s+" Grove Reset"
 puts Time.now.to_s+" Turning on watering system"
 
 # Run Watering.py script for duration specified.
-# system("python /home/pi/Projects/garden/water.py #{duration_parameter}")
-# system("python water.py #{duration_parameter}")
+system("python water.py #{duration_parameter}")
 puts Time.now.to_s+" Turning off watering system"
 session_finish_time = Time.now
 
