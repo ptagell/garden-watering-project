@@ -26,7 +26,7 @@ puts "Current time hour is "+current_time_local.to_s
 
 # I stumbled across an issue whereby the GrovePi would need resetting (RST light woudl activate). This line resets the GrovePi before trying to run any commands with it. Important to do it before each watering session to increase the chances it doesn't fail during the watering session (and keep watering...watering...watering)
 puts Time.now.to_s+" Reset grove to clear warnings"
-system("avrdude -c gpio -p m328p")
+# system("avrdude -c gpio -p m328p")
 puts Time.now.to_s+" Grove Reset"
 
 # Turn on the watering system using the Python controller code for the Grove Relay.
@@ -35,7 +35,7 @@ puts Time.now.to_s+" Turning on watering system"
 
 # Run Watering.py script for duration specified.
 # system("python /home/pi/Projects/garden/water.py #{duration_parameter}")
-system("python water.py #{duration_parameter}")
+# system("python water.py #{duration_parameter}")
 puts Time.now.to_s+" Turning off watering system"
 session_finish_time = Time.now
 
@@ -50,8 +50,8 @@ report = "A watering session has just finished. It lasted "+session_duration.rou
 url = URI.parse("https://api.pushover.net/1/messages.json")
 req = Net::HTTP::Post.new(url.path)
 req.set_form_data({
-  :token => "a1es1k2nyyoz13fpo2ekh4q24dcdid",
-  :user => "ua6cn981x8kcqv2a461qt194md63z9",
+  :token => ENV["PUSHOVER_APP_TOKEN"],
+  :user => ENV["PUSHOVER_USER_KEY"],
   :message => report,
 })
 res = Net::HTTP.new(url.host, url.port)
