@@ -34,8 +34,8 @@ puts Time.now.to_s+" Grove Reset"
 puts Time.now.to_s+" Turning on watering system"
 
 # Run Watering.py script for duration specified.
-system("python /home/pi/Projects/garden/water.py #{duration_parameter}")
-# system("python water.py #{duration_parameter}")
+# system("python /home/pi/Projects/garden/water.py #{duration_parameter}")
+system("python water.py #{duration_parameter}")
 puts Time.now.to_s+" Turning off watering system"
 session_finish_time = Time.now
 
@@ -45,14 +45,14 @@ session_finish_time = Time.now
 session_duration = session_finish_time - session_start_time
 session_water_used = session_duration / 60 * zone_one_flow_rate
 
-print "Watering session lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
+report = "A watering session has just finished. It lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
 
 url = URI.parse("https://api.pushover.net/1/messages.json")
 req = Net::HTTP::Post.new(url.path)
 req.set_form_data({
-  :token => "PUSHOVER_APP_TOKEN",
-  :user => "PUSHOVER_USER_KEY",
-  :message => "session_duration",
+  :token => "a1es1k2nyyoz13fpo2ekh4q24dcdid",
+  :user => "ua6cn981x8kcqv2a461qt194md63z9",
+  :message => report,
 })
 res = Net::HTTP.new(url.host, url.port)
 res.use_ssl = true
