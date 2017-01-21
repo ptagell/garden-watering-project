@@ -37,7 +37,7 @@ puts Time.now.to_s+" Turning on watering system"
 system("python /home/pi/Projects/garden/water.py #{duration_parameter}")
 # system("python water.py #{duration_parameter}")
 puts Time.now.to_s+" Turning off watering system"
-session_finish_time = current_time_local = session_start_time.localtime
+session_finish_time = Time.now
 
 # Report about watering session
 
