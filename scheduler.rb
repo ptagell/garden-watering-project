@@ -1,4 +1,7 @@
+# required to push notifications
 require "net/https"
+# required to access .env variables
+require 'dotenv/load'
 
 # This file is responsible for controlling when the `water.py` script is invoked.
 
@@ -50,11 +53,13 @@ report = "A watering session has just finished. It lasted "+session_duration.rou
 url = URI.parse("https://api.pushover.net/1/messages.json")
 req = Net::HTTP::Post.new(url.path)
 req.set_form_data({
-  :token => ENV["PUSHOVER_APP_TOKEN"],
-  :user => ENV["PUSHOVER_USER_KEY"],
+  :token => ENV['PUSHOVER_APP_TOKEN'],
+  :user => ENV['PUSHOVER_USER_KEY'],
   :message => report,
 })
 res = Net::HTTP.new(url.host, url.port)
 res.use_ssl = true
 res.verify_mode = OpenSSL::SSL::VERIFY_PEER
 res.start {|http| http.request(req) }
+
+puts "Notified iOS application successfully"
