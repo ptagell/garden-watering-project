@@ -257,6 +257,17 @@ After being away at the beach for a week with only as neighbour to check on the 
 
 The logs I set up were also of great use. I was able to check each morning to make sure that, at least according to the logs, the system had turned off each morning.
 
+## 21 Jan 2017.
+
+* Got notifications working to iOS device
+* Learnt how to invoke RBENV from crontab jobs using slightly longer crontab command.
+* Made the mistake of committing my secret keys to github.
+* Fixed mistake by rotating keys.
+* Measured my water flow by taking a video of my water meter while the system was on, creating a flow rate number and using that for reporting purposes.
+* Start to add the concepts of zones into the code. Need to expand on this when additional relays arrive for other zones.
+* Investigated downstream solenoids to control sub-zoning (in particular want to water wicking beds less frequently depending on moisture levels)
+* 12V current available (from garden lighting) appears to be dangerous for electronics due to fluctuation. Need to investigate more. 
+
 # Ideas
 
 Ideas for next steps for this project include:
