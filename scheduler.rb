@@ -7,7 +7,7 @@ require "net/https"
 zone_one_flow_rate = 20
 
 # zone 2 settings
-zone_two_flow rate = 0
+zone_two_flow_rate = 0
 
 # Extract watering duration from command
 duration_parameter = ARGV.first
