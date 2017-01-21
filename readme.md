@@ -263,3 +263,9 @@ Ideas for next steps for this project include:
 
 * Wireless, solar powered soil moisture sensors
 * Wireless, solar charged, battery operated solenoids to allow bed-by-bed irrigation
+
+
+
+# Installation notes
+
+- Add Env variables for notifications into `/etc/environment`.

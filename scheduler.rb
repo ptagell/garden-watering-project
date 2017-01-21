@@ -46,3 +46,15 @@ session_duration = session_finish_time - session_start_time
 session_water_used = session_duration / 60 * zone_one_flow_rate
 
 print "Watering session lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
+
+url = URI.parse("https://api.pushover.net/1/messages.json")
+req = Net::HTTP::Post.new(url.path)
+req.set_form_data({
+  :token => "PUSHOVER_APP_TOKEN",
+  :user => "PUSHOVER_USER_KEY",
+  :message => "session_duration",
+})
+res = Net::HTTP.new(url.host, url.port)
+res.use_ssl = true
+res.verify_mode = OpenSSL::SSL::VERIFY_PEER
+res.start {|http| http.request(req) }
