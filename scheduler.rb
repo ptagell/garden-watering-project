@@ -45,4 +45,4 @@ session_finish_time = Time.now
 session_duration = session_finish_time - session_start_time
 session_water_used = session_duration / 60 * zone_one_flow_rate
 
-print "Watering session lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ "litres of water"
+print "Watering session lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
