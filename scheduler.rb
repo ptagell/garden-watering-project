@@ -37,7 +37,7 @@ puts Time.now.to_s+" Grove Reset"
 puts Time.now.to_s+" Turning on watering system"
 
 # Run Watering.py script for duration specified.
-system("python water.py #{duration_parameter}")
+system("python /home/pi/Projects/garden/water.py #{duration_parameter}")
 puts Time.now.to_s+" Turning off watering system"
 session_finish_time = Time.now
 
@@ -62,3 +62,4 @@ res.verify_mode = OpenSSL::SSL::VERIFY_PEER
 res.start {|http| http.request(req) }
 
 puts "Notified iOS application successfully"
+system("avrdude -c gpio -p m328p")
