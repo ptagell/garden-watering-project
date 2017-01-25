@@ -280,3 +280,6 @@ Ideas for next steps for this project include:
 # Installation notes
 
 - Add Env variables for notifications into `/etc/environment`.
+- `
+2 5 * * * /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1500 >> /tmp/cron_output
+` Working crontab line. Requires RVM and creation of .rmvrc file for project I think.  
