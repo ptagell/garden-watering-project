@@ -49,6 +49,10 @@ session_water_used = session_duration / 60 * zone_one_flow_rate
 
 report = "A watering session has just finished. It lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
 
+puts ENV['PUSHOVER_APP_TOKEN']
+
+
+
 url = URI.parse("https://api.pushover.net/1/messages.json")
 req = Net::HTTP::Post.new(url.path)
 req.set_form_data({
