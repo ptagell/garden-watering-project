@@ -1,10 +1,6 @@
-# Readme
+# SRPinkler
 
-* [Overview](#overview)
-* [Plumbing](#plumbing)
-* [Electronics](#electronics)
-* [Code](#code)
-* [Ideas](#ideas)
+An easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
 
 # Overview
 
@@ -30,9 +26,7 @@ I should also point out that I've found lots of great projects online which tack
 
 **If you're considering this yourself, a word of warning**
 
-This probably won't save you money.
-
-It may not even save your garden.
+This probably won't save you money. It may not even save your garden.
 
 For me, excluding the cost of the Pi and Grove (which I already had) the total cost of this experiment has probably been about $180AUD allowing $150 for plumbing supplies, $30 for additional power boards, ethernet cables etc.  This actually isn't insane given that it will easily cost [about $100](https://www.bunnings.com.au/search/products?facets=CategoryIdPath%3D2a021706-07d5-4648-bf26-2ea8fea049df%20%3E%2001f69b03-7098-42c3-b3c2-0a3c184efb7c%20%3E%20e5264067-f17e-4981-9c75-26549d354caa%20%3E%2042eb706d-7dc4-4acb-af34-f13db5f9c46a%20%3E%201cd2c5bb-f801-4add-bb56-6a7e8e76dce7) to buy a controller at your hardware shop and then you'll have to hand over more for solenoids, pipes, wires etc.
 
@@ -41,6 +35,116 @@ For me, the most important thing I've learnt through this project is the _conseq
 Still, I'd recommend this regardless. It's been great fun. I hope this helps you automate your own garden.
 
 This document is broken into four sections for easy reference, and the code is really simple. I'll try and keep the software concerns seperate as I build this project out over time so you can pick it up and use what you need without needing to understand lots of complicated code. I'll also try and remember to comment lots so it's easy to understand. Thank you to all the other open source projects that do this also! It's only because of the forethought and generosity of time others have given that I've been able to learn how to do any of this.  
+
+# Non-code related
+
+* [Overview](#overview)
+* [Plumbing](#plumbing)
+* [Electronics](#electronics)
+* [Code installation](#code_installation)
+* [Ideas](#ideas)
+
+
+# Code installation
+
+To get sRPinkler working you'll need to do the following on your Pi.
+
+1. Download the Dexter Industries image from their github repository and get this onto your MicroSD card.
+2. Follow the steps to set the GrovePi+ including upgrading the firmware. This is important as I've had issues with the GrovePi+ needing a hard reset without this. You'll notice this if you see the red RST light illuminated or if the water just doesn't run.
+3. Clone the rep into your Projects directory. I store all my projects at `~/Projects/` and the sPinkler at `~/Projects/garden-watering-project`. Note: This is important as you'll need absolute paths in both `Crontab` and your `scheduler.rb` file.
+4. Install `RVM` [following these instructions](https://rvm.io/rvm/install). Note: I could not get this system to work using `rbenv` as it does not have the `crontab` integration mentioned below.
+5. then `rvm install 2.3.0`
+6. Create a gemset called `garden` buy running `rvm gemset create garden`.
+7. Run `gem install bundler` followed by `bundle install` to install the required gems into the gemset you've created.
+8. Run `rvm cron setup` to enable your crontab to access the version of ruby and gemset you've created. Thanks [Daniel Schmidt](https://coderwall.com/p/vhv8aw/getting-ruby-scripts-working-with-bundler-rvm-and-cron)
+
+## Configuring your electronics and zones
+1. Once you've got your Ruby environment set up, it's time to configure your Grove Relays to trigger at the right times. To do this, open the file `scheduler.rb`.
+2. At the top of the files are the variables you need to configure. To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
+```
+@zone_1_relay = 5
+@zone_2_relay = 4
+@zone_3_relay = 3
+```
+3. This is also where you can customise the names of your zones by modifying the entries for `@zone_n_friendly_name`. Make sure your friendly name is surrounded by the `"` character.
+4. For reporting purposes, you can also set up a flow rate here by modifying the `@zone_n_flow_rate` entries. This number is in **litres per minute**. The easiest way to get this is to make sure no other water is being used in your house and do a test water of the zone you're looking to get the flow rate for. I recommend using your smartphone to take a video for around 30 seconds while you wait for at least a litre of water to flow through the meter. Depending on your watering system this will take a long time (drippers) or a short time (sprinklers). To calculate `flow_rate`:
+* look at how many seconds it took to use a litre of water.
+* Divide by the number of seconds it took and multiply by 60. eg. if it takes 43 seconds to use a litre of water.
+`1 / 43 * 60 = 1.39 litres per minute`
+
+## Notifications
+
+In order to get Notifications working, you'll need to set up a [Pushover Account](#) then decide which devices you want to notify when a watering system is completed. At present notifications include the duration of watering in minutes and the volume of water used. Volume of water used is an approximation.
+
+To setup notifications:
+
+1. Go to `Pushover` and signup for an account.
+2. Obtain your `PUSHOVER USER KEY`
+3. Create a new application and get it's `PUSHOVER APP TOKEN`.
+4. Rename the file called `.env.sample` in the root of your directory (eg. for me `~/Projects/garden-watering-project/.env`) and add these two entries to the file in format you find there:
+
+example .env file
+```
+PUSHOVER_APP_TOKEN=apptokengoeshere
+PUSHOVER_USER_KEY=userkeygoeshere
+```
+5. Install the Pushover app on the devices you'd like the notified on (eg. the Pusover iOS application) and sign in using your account credentials.
+
+
+
+### Test notifications
+Test notifications by opening your terminal and running:
+
+`cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 2 >> /tmp/cron_output`
+
+Note: this will turn on your garden watering for 2 seconds, then submit a notification to pushover. If it doesn't work, there is probably an error either in your `.env` file or your pushover implementation. The other issue I have run into many times is that the environment in which `cron` runs does not have access to your gems (and hence can't get to the `.env` file using the `dotenv` gem). The only way I found to resolve this was to follow the RVM related steps above.
+
+## Test watering
+
+I would strongly recommend doing a test watering once you've got to this point. I'd also suggest testing in a way that will pump the pipes quite hard to make sure that, if something is going to break, it breaks while you're testing it and not once you go on holidays for a week (and flood your house).
+
+The test watering script below will stress test your watering system by turning it on ever minute for 30 seconds (enough time to hopefully fill your pipes and get to max pressure (the sort that causes your plumbing to pop apart), 30 seconds break then turn it on again). If you have more than one zone, each zone will run sequentially.
+
+To test water in this way, open terminal, type `crontab -e` and paste in the following script.
+
+If you have one zone (runs every minute)
+```
+* * * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 30 >> /tmp/cron_output
+```
+
+If you have two zone (runs every second minute)
+```
+*/2 * * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 30 30 >> /tmp/cron_output
+```
+
+Let the script run for 10-20 minutes. Press `CTRL+C` to kill the script (make sure you're in a break period when you do this or you'll need to hard reset)
+
+
+## Setting up ongoing automatic watering.
+1. From terminal, type `crontab -e` to edit your crontab file (`crontab` runs tasks every minute on a schedule you specify).
+2. Read through the example crontabs below. Pick one, modify it to suit your needs, then paste the following into the `crontab`. Make sure there is a new line at the end of it. These lines should go immediately after the lines added by `RVM`.
+
+eg. Running one zone, twice a day starting at 5:01am for 1200 seconds and starting at 6:01pm for 800 seconds
+```
+01 5 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1200 >> /tmp/cron_output
+01 18 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 800 >> /tmp/cron_output
+```
+eg. Running two zones, twice a day starting at 5:01am for 1200 seconds each (one after the other) and starting at 6:01pm for 800 seconds each (one after the other)
+```
+01 5 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1200 1200 >> /tmp/cron_output
+01 18 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 800 800 >> /tmp/cron_output
+```
+eg. Running two zones, twice a day starting at 5:01am with the first zone running for 1200 seconds and the second for 500 seconds (one after the other) and starting at 6:01pm with only the second zone being watered for 800 seconds each (one after the other)
+```
+01 5 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1200 500 >> /tmp/cron_output
+01 18 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 0 800 >> /tmp/cron_output
+```
+eg. Running three zones, one after the other starting at 5:01am. Zone one first for 1200 seconds, zone two for 500 seconds and zone three for 600 seconds.
+```
+01 5 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1200 500 600 >> /tmp/cron_output
+```
+
+
 
 # Plumbing
 
@@ -112,174 +216,3 @@ Here you can see:
 4. Wires taped waiting for second relay to arrive from [Little Bird Electronics](https://littlebirdelectronics.com.au).
 5.  Temperature/humidity sensor top right (for a [seperate project](http://tagell.com/projects/kyneton-temperature-logger/))
 6.  Holes for ethernet and USB-power to come into the green box to power and control the Raspberry Pi.
-
-# Code
-
-## Challenges
-
-For me there were are a few challenges I have/will faced in this project.
-
-* **Not that familiar with Python.**
-Everything to do with IoT seems to be in Python. I have more experience in Ruby so this could trip me up.
-* **Not that familiar with electricity...and electricity and water don't mix.**
-Seems obvious.
-* **Learning raspberry pi.**
-Hurrah. In we go.
-
-## Method & Progress
-
-To help myself overcome some of these issues, I've broken the challenge down into some smaller steps to knock over one at a time. I'll keep this list updated as I go.
-
-- [X] Be able to turn on and off the relay using a switch.
-- [X] Be able to turn on and off the relay using a script, keeping it on for a few seconds, then turning it off.
-- [X] Be able to turn the relay on for a period of minutes, then off again.
-- [X] Be able to turn the relay on at a defined time for a period of time (eg. at 3pm for 20 mins). Stop scripts from stomping on each other.
-- [ ] Be able to do the same thing with more than one system.
-- [ ] Be able to reliably start and stop smaller watering jobs (eg. 10 minute watering session) via my mobile phone - I currently use SimpleSSH for iOS but am keen to give [Prompt2](https://panic.com/prompt/) a go.
-- [ ] MAYBE: Integrate with a home assistant so that I can verbally say "water my garden for `n` minutes" and actually have that work...because we live in the future (also gives me a good reason to buy said assistant)
-- [ ] MAYBE: Integrate my timing with Google Calendar to use that to turn on and off the system using named calendar events.
-- [ ] MAYBE: Deliver push notifications to my phone when watering is started, stopped or if there is an error.
-
-
-# Code progress diary
-
-## 6th Jan, 2017.
-
-### Be able to turn on and off the relay using a switch.
-
-This was easy. I managed to do this using a built in Python script provided by the GrovePi Software
-
-### Be able to turn on and off the relay using a script, keeping it on for a few seconds, then turning it off.
-
-This was also achievable using a modified version of the script. Basically, adjusting the sleep duration after turning the Relay "On" was enough to make this work.
-
-```
-#!/usr/bin/env python
-
-# NOTE: Relay is normally open. LED will illuminate when closed and you will hear a definitive click sound
-import time
-import grovepi
-import sys
-
-
-# Connect the Grove Relay to digital port D8
-# SIG,NC,VCC,GND
-relay = 7
-led = 8
-
-grovepi.pinMode(relay,"OUTPUT")
-
-while True:
-    try:
-        # switch on for 5 seconds
-        grovepi.digitalWrite(relay,1)
-        grovepi.digitalWrite(led,1)
-        print ("on")
-        time.sleep(5)
-
-        # switch off for 5 seconds
-        grovepi.digitalWrite(relay,0)
-        grovepi.digitalWrite(led,0)
-        print ("Water off")
-        time.sleep(5)
-
-        sys.exit()
-
-    except KeyboardInterrupt:
-        grovepi.digitalWrite(relay,0)
-        break
-    except IOError:
-        print ("Error")
-```
-
-## 7th Jan, 2017
-### Be able to turn the relay on at a defined time for a period of time (eg. at 3pm for 20 mins). Stop scripts from stomping on each other.
-
-#### Thoughts:
-
-**System**
-- Set up a cronjob to run every `n` mins.
-
-**Ruby** (scheduling, APIs)
-- Get `Time.now.hour` and `Time.now.min` using Ruby.
-- If `Hour` and `Min` are within a target range at the time of checking, run a python script.
-
-**Python**
-- Run an `on` script for a `period` of time. This would run for n minutes and then turn off. Eventually, I could probably set `n` using the duration of a google calendar item.
-- Close the script and python.
-
-**System**
-- Restart
-
-This would let me run most of the logic in ruby and only dive into Python when I need to toggle the systems on or off.
-
-### Report:
-
-Got this working quite easily and much like the above.
-
-I did run into a small issue whereby the Seed grove that I was using the control the relay would error and display a red RST light. Reading on the forums this is a relatively common issue with the board.
-
-Apart from disconnecting the power, the only solution to the issue is to run a reset command for the board, which I've now put into a seperate ruby script so I can run it when I need to.
-
-Another issue I've come across is that while the script seems to work all of the time, occasionally, the solenoid does not work. I'm not sure what could be causing this. It's either that the relay is not closing properly or that the solenoid isn't working. Potentially this could be to do with the mechanical components within the solenoid not making contact correctly, and therefore the solenoid circuit not being completed. Strangely it does not happen every time though.
-
-The crontab is pretty simple. Every hour, at 5 minutes past the hour, run the `schedule.rb` file. If the hour is correct, run the `water.py` script for the length of time provided in the original command parameter (in this case, 1800 seconds, or 30 minutes).
-
-```
-5 * * * *  ruby /home/pi/Projects/garden/scheduler.rb 1800 >> /tmp/cron_output
-```
-
-Eventually I'll need to expand this to allow for more parameters - for example, zones (-z) or time (-t).
-
-### 4:56pm, 7 Jan, 2017
-
-_Success_. After assembling the solenoids, pi and watering systems, rewiring my shed with additional ethernet cables and bashing a hole through the tin side of my shed with a back-hoe, I've had my first successful test firing. I've been able to control the flow of water in my back garden safely using the internet! What a time to be alive. The joy, the wonder. Amaze.
-
-The issue I found before whereby the solenoid would not fire has also seemingly resolved itself. Perhaps the solenoids work differently under pressure from the water than they do without this. Interesting.
-
-My script also checks the time correctly in production, which is great.
-
-My first trial only includes a single bed and I need one more relay before I can move onto the second step - controlling more than one zone. It's all wired up though, so should just be a question of ordering a few more relays (I suspect I want to move onto my garden lights next). I suspect the limiting factor for my beds will end up being water pressure. I also may need additional zones to cater to the fact that some plants need more water (usually vegetables) and some less (usually flowers and natives).  
-
-## Monday 9th Jan 2017
-
-### Disaster strikes
-
-Just before leaving, I was showing [@arcarson](https://github.com/arcarson) went to look at the system and found that the three way manifold I'd created from poly pipe (leading from the mains and to the solenoids) had failed. This was due to the fact that the hoses before the manifold had popped off the valve due to the mains pressure. I was very glad this happened as it showed that my initial plumbing design had been flawed...if it hadn't failed when it did, my shed would've become even more flooded (the plastic box well and was overflowing with water when I found it).
-
-I replaced the failed-manifold with one that was far better constructed, as well as the various connectors. This added $100 to the cost, but now I'm relatively confident that it won't burst again. I just need to remember to drain the irrigation system before winter sets in (and the pipes potentially freeze).
-
-**Note**: Hardware list above has been updated.
-
-## Sunday 15 Jan 2017.
-
-After being away at the beach for a week with only as neighbour to check on the system, I've returned home and there is neither water leaking everywhere or a dry garden. The system worked. Although I initially had the system watering for 1 hour at 5am, I decided to change this to 30 minutes.
-
-The logs I set up were also of great use. I was able to check each morning to make sure that, at least according to the logs, the system had turned off each morning.
-
-## 21 Jan 2017.
-
-* Got notifications working to iOS device
-* Learnt how to invoke RBENV from crontab jobs using slightly longer crontab command.
-* Made the mistake of committing my secret keys to github.
-* Fixed mistake by rotating keys.
-* Measured my water flow by taking a video of my water meter while the system was on, creating a flow rate number and using that for reporting purposes.
-* Start to add the concepts of zones into the code. Need to expand on this when additional relays arrive for other zones.
-* Investigated downstream solenoids to control sub-zoning (in particular want to water wicking beds less frequently depending on moisture levels)
-* 12V current available (from garden lighting) appears to be dangerous for electronics due to fluctuation. Need to investigate more. 
-
-# Ideas
-
-Ideas for next steps for this project include:
-
-* Wireless, solar powered soil moisture sensors
-* Wireless, solar charged, battery operated solenoids to allow bed-by-bed irrigation
-
-
-
-# Installation notes
-
-- Add Env variables for notifications into `/etc/environment`.
-- `
-2 5 * * * /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1500 >> /tmp/cron_output
-` Working crontab line. Requires RVM and creation of .rmvrc file for project I think.  
