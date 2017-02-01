@@ -6,64 +6,114 @@ require 'dotenv/load'
 # This file is responsible for controlling when the `water.py` script is invoked.
 
 # zone 1 settings
-# in litres per minute
-zone_one_flow_rate = 20
-
+@zone_1_friendly_name = "Back Garden"
+@zone_1_flow_rate = "20"
+@zone_1_relay = 5
+@zone_1_duration = ARGV[0]
 # zone 2 settings
-zone_two_flow_rate = 0
+@zone_2_friendly_name = "Front Garden"
+@zone_2_flow_rate = "1.25"
+@zone_2_relay = 4
+@zone_2_duration = ARGV[1]
+# zone 3 settings
+@zone_3_friendly_name = "Wicking Beds"
+@zone_3_flow_rate = "20"
+@zone_3_relay = 3
+@zone_3_duration = ARGV[2]
 
-# Extract watering duration from command
-duration_parameter = ARGV.first
-puts "Run water system for "+duration_parameter+" seconds"
+@number_of_zones_to_water = ARGV.count
+@session_start_time = Time.now.localtime
 
-# Find current time.
-session_start_time = Time.now
-# Localise the current time.
-current_time_local = session_start_time.localtime.hour
-
-# Print the current time into logs or terminal in both UTC and local time.
-puts "Current UTC time is "+session_start_time.to_s
-puts "Current time hour is "+current_time_local.to_s
-#Specify a local start time in 24 hour time (eg. 2pm is the 14th hour of the day)
-# Output the start time to logs or terminal
+# duration of sleep (needed for resets)
+@sleep_duration = 0
 
 # I stumbled across an issue whereby the GrovePi would need resetting (RST light woudl activate). This line resets the GrovePi before trying to run any commands with it. Important to do it before each watering session to increase the chances it doesn't fail during the watering session (and keep watering...watering...watering)
-puts Time.now.to_s+" Reset grove to clear warnings"
-system("avrdude -c gpio -p m328p")
-puts Time.now.to_s+" Grove Reset"
+def grove_reset
+  puts Time.now.localtime.to_s+" Reset grove to clear warnings"
+  system("avrdude -c gpio -p m328p")
+  sleep(@sleep_duration) # wait for reboot to finish
+  puts Time.now.localtime.to_s+" Grove Reset"
+end
 
 # Turn on the watering system using the Python controller code for the Grove Relay.
 # Note: this code only works for one watering zone at present.
-puts Time.now.to_s+" Turning on watering system"
+def water_garden(relay, duration)
+  puts Time.now.localtime.to_s+" Turning on watering system"
+  # Run Watering.py script for duration specified.
+  # system("python water.py #{relay} #{duration}")
+  # system("python /home/pi/Projects/garden/water.py #{relay} #{duration}")
+  # puts("python /home/pi/Projects/garden/water.py #{relay} #{duration}")
+  puts Time.now.localtime.to_s+" Turning off watering system"
+end
 
-# Run Watering.py script for duration specified.
-system("python /home/pi/Projects/garden/water.py #{duration_parameter}")
-puts Time.now.to_s+" Turning off watering system"
-session_finish_time = Time.now
+def water_by_zone
+  for i in 1..@number_of_zones_to_water do
+    relay = instance_variable_get("@zone_"+i.to_s+"_relay")
+    duration = instance_variable_get("@zone_"+i.to_s+"_duration")
+
+    if duration.to_i != 0
+      grove_reset
+      puts Time.now.localtime.to_s+" Session start time is "+@session_start_time.to_s
+      water_garden(relay, duration)
+      grove_reset
+      puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" done"
+    elsif duration.to_i == 0
+      puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" skipped as no zero specified"
+    end
+    puts "\n\n===== MOVING TO NEXT ZONE =====\n\n\n"
+  end
+end
 
 # Report about watering session
+def report
 
-# Report on Zone One
-session_duration = session_finish_time - session_start_time
-session_water_used = session_duration / 60 * zone_one_flow_rate
+  @litres_used = 0
+  @total_session_duration = 0
 
-report = "A watering session has just finished. It lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
+  for i in 1..@number_of_zones_to_water do
+    # litres_used = litres_used+ARGV[i].to_i*instance_variable_get("@zone_"+i.to_s+"_flow_rate")
+    duration = instance_variable_get("@zone_"+i.to_s+"_duration").to_f
+    puts duration
+    flow_rate_sec = instance_variable_get("@zone_"+i.to_s+"_flow_rate").to_f
+    puts flow_rate_sec
 
-puts ENV['PUSHOVER_APP_TOKEN']
+    # puts this_session_duration.to_s+"thissessionduration"
+    litres_used_this_session = (duration*flow_rate_sec)
+    # puts litres_used_this_session.to_s+"litres_used_this_session"
+    # @total_session_duration = @total_session_duration + this_session_duration
+    # puts @total_session_duration.to_s+"total duration"
+    # @litres_used = @litres_used.to_f + litres_used_this_session.to_f
+    # puts @litres_used.to_s+"litres_used"
+  end
+end
+
+def notify
+
+  zone1flow vol * seconds
+  plus
+  zone2flow vol * seconds
+  plus
+
+  report = "A watering session has just finished. It lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
+
+  url = URI.parse("https://api.pushover.net/1/messages.json")
+  req = Net::HTTP::Post.new(url.path)
+  req.set_form_data({
+    :token => ENV['PUSHOVER_APP_TOKEN'],
+    :user => ENV['PUSHOVER_USER_KEY'],
+    :message => report,
+  })
+  res = Net::HTTP.new(url.host, url.port)
+  res.use_ssl = true
+  res.verify_mode = OpenSSL::SSL::VERIFY_PEER
+  res.start {|http| http.request(req) }
+  if ENV['PUSHOVER_APP_TOKEN'] != nil
+    puts Time.now.localtime.to_s+"Notified iOS application successfully"
+  end
+end
 
 
 
-url = URI.parse("https://api.pushover.net/1/messages.json")
-req = Net::HTTP::Post.new(url.path)
-req.set_form_data({
-  :token => ENV['PUSHOVER_APP_TOKEN'],
-  :user => ENV['PUSHOVER_USER_KEY'],
-  :message => report,
-})
-res = Net::HTTP.new(url.host, url.port)
-res.use_ssl = true
-res.verify_mode = OpenSSL::SSL::VERIFY_PEER
-res.start {|http| http.request(req) }
 
-puts "Notified iOS application successfully"
-system("avrdude -c gpio -p m328p")
+water_by_zone
+report
