@@ -14,8 +14,9 @@ print ("===== IN PYTHON =====")
 # Accept parameters from Ruby/Command line and store for watering session
 # Relay and Duration from Parameters
 relay = int(sys.argv[1:][0])
+print relay
 duration = int(sys.argv[1:][1])
-
+print duration
 grovepi.pinMode(relay,"OUTPUT")
 
 print ("Attempting to turn on the water")

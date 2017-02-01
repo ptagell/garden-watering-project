@@ -25,7 +25,7 @@ require 'dotenv/load'
 @session_start_time = Time.now.localtime
 
 # duration of sleep (needed for resets)
-@sleep_duration = 0
+@sleep_duration = 1
 
 # I stumbled across an issue whereby the GrovePi would need resetting (RST light woudl activate). This line resets the GrovePi before trying to run any commands with it. Important to do it before each watering session to increase the chances it doesn't fail during the watering session (and keep watering...watering...watering)
 def grove_reset
@@ -50,10 +50,10 @@ def water_by_zone
     relay = instance_variable_get("@zone_"+i.to_s+"_relay")
     duration = instance_variable_get("@zone_"+i.to_s+"_duration")
     if duration.to_i != 0
-      grove_reset
+      # grove_reset
       puts Time.now.localtime.to_s+" Session start time is "+@session_start_time.to_s
       water_garden(relay, duration)
-      grove_reset
+      # grove_reset
       puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" done"
     elsif duration.to_i == 0
       puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" skipped as no zero specified"
