@@ -50,7 +50,6 @@ def water_by_zone
   for i in 1..@number_of_zones_to_water do
     relay = instance_variable_get("@zone_"+i.to_s+"_relay")
     duration = instance_variable_get("@zone_"+i.to_s+"_duration")
-
     if duration.to_i != 0
       grove_reset
       puts Time.now.localtime.to_s+" Session start time is "+@session_start_time.to_s
@@ -66,36 +65,23 @@ end
 
 # Report about watering session
 def report
-
   @litres_used = 0
   @total_session_duration = 0
-
   for i in 1..@number_of_zones_to_water do
     # litres_used = litres_used+ARGV[i].to_i*instance_variable_get("@zone_"+i.to_s+"_flow_rate")
     duration = instance_variable_get("@zone_"+i.to_s+"_duration").to_f
-    puts duration
     flow_rate_sec = instance_variable_get("@zone_"+i.to_s+"_flow_rate").to_f
-    puts flow_rate_sec
-
     # puts this_session_duration.to_s+"thissessionduration"
     litres_used_this_session = (duration*flow_rate_sec)
     # puts litres_used_this_session.to_s+"litres_used_this_session"
-    # @total_session_duration = @total_session_duration + this_session_duration
-    # puts @total_session_duration.to_s+"total duration"
-    # @litres_used = @litres_used.to_f + litres_used_this_session.to_f
-    # puts @litres_used.to_s+"litres_used"
+    @total_session_duration = @total_session_duration + duration
+    @litres_used = @litres_used.to_f + litres_used_this_session.to_f
   end
+  @total_session_duration = @total_session_duration/60
 end
 
 def notify
-
-  zone1flow vol * seconds
-  plus
-  zone2flow vol * seconds
-  plus
-
-  report = "A watering session has just finished. It lasted "+session_duration.round(2).to_s+" seconds and used "+session_water_used.round(2).to_s+ " litres of water"
-
+  report = Time.now.localtime.to_s+"A watering session has just finished. It lasted "+@total_session_duration.round(2).to_s+" minutes and used "+@litres_used.to_s+ " litres of water"
   url = URI.parse("https://api.pushover.net/1/messages.json")
   req = Net::HTTP::Post.new(url.path)
   req.set_form_data({
@@ -108,12 +94,10 @@ def notify
   res.verify_mode = OpenSSL::SSL::VERIFY_PEER
   res.start {|http| http.request(req) }
   if ENV['PUSHOVER_APP_TOKEN'] != nil
-    puts Time.now.localtime.to_s+"Notified iOS application successfully"
+    puts Time.now.localtime.to_s+" notified iOS application successfully"
   end
 end
 
-
-
-
 water_by_zone
 report
+notify
