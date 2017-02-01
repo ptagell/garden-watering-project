@@ -16,11 +16,11 @@ print ("===== IN PYTHON =====")
 relay = int(sys.argv[1:][0])
 duration = int(sys.argv[1:][1])
 
-# grovepi.pinMode(relay,"OUTPUT")
+grovepi.pinMode(relay,"OUTPUT")
 
 print ("Attempting to turn on the water")
 # Turn the relay to the on position
-# grovepi.digitalWrite(relay,1)
+grovepi.digitalWrite(relay,1)
 # Confirm the water is on. Note: Not sure how to verify this without some sort of flow sensor.
 print ("Water is on")
 # This is the duration of watering in seconds.
@@ -28,7 +28,7 @@ time.sleep(duration)
 
 print ("Ending...trying to turning off water")
 # Turn the relay off.
-# grovepi.digitalWrite(relay,0)
+grovepi.digitalWrite(relay,0)
 print ("Water is off")
 
 print ("===== LEAVING PYTHON =====")
