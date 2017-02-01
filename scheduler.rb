@@ -41,8 +41,7 @@ def water_garden(relay, duration)
   puts Time.now.localtime.to_s+" Turning on watering system"
   # Run Watering.py script for duration specified.
   # system("python water.py #{relay} #{duration}")
-  # system("python /home/pi/Projects/garden/water.py #{relay} #{duration}")
-  # puts("python /home/pi/Projects/garden/water.py #{relay} #{duration}")
+  system("python /home/pi/Projects/garden-watering-project/water.py #{relay} #{duration}")
   puts Time.now.localtime.to_s+" Turning off watering system"
 end
 
