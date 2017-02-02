@@ -1,14 +1,19 @@
 # SRPinkler
 
-An easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
-
 # Overview
 
-A simple project to automate my home watering. I already have a quite extensive system of pipes and such set up to water my plants. The problem is that from what I've been reading it's best to water plants low and slow in the morning under mulch, rather than high and fast in the evening with a beer and hose. This is better for the plants from a mildew and fungal perspective and also conserve moisture as, if I water just before dawn, it will get a chance to soak in and get to the roots before the sun is high.
+SRPinkler is an easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
 
-I'm not an early riser.
+Based off the dual-premise that it is better for plants for them to be watered early in the morning and that most people don't like to wake up at 4am to water the garden, this project walks through both the code and IRL setups required to automate your garden watering.
 
-So, to overcome these things I've put together this series of scripts to control two solenoids (starting with one) on a timer using:
+This readme is divided into several sections:
+
+* [Overview - this section](#overview)
+* [Plumbing](#plumbing)
+* [Electronics](#electronics)
+* [Code](#code_installation)
+
+You will/may need:
 
 * [Raspberry Pi](https://littlebirdelectronics.com.au/products/raspberry-pi-2-model-b-1)
 * [GrovePi+ board](https://www.dexterindustries.com/shop/grovepi-board/)
@@ -21,6 +26,7 @@ So, to overcome these things I've put together this series of scripts to control
 * [Pope 25mm 3 outlet manifold](https://www.bunnings.com.au/pope-25mm-3-outlet-manifold_p3120691)
 * 3 x lengths of rigid BSP pipe (thicker, solid pipe with male threaded ends)
 * [Assorted BSP 1" bits and pieces](https://www.bunnings.com.au/search/products?q=bsp%20pipe%201%22) - I would recommend staying away from the "[nut and tail](https://www.bunnings.com.au/pope-25mm-poly-nut-and-tail_p3123863)" type joins as they seem quite hard to get to stop leaking.
+* Watering devices to suit your garden (sprinklers, drippers, misters)
 
 I should also point out that I've found lots of great projects online which tackle this problem in similar ways. [Open Sprinkler Pi](https://opensprinkler.com/product/opensprinkler-pi/) really took my fancy, but I realised that because I already had a Pi and Grove, I didn't really need to buy a seperate controller.
 
@@ -36,16 +42,81 @@ Still, I'd recommend this regardless. It's been great fun. I hope this helps you
 
 This document is broken into four sections for easy reference, and the code is really simple. I'll try and keep the software concerns seperate as I build this project out over time so you can pick it up and use what you need without needing to understand lots of complicated code. I'll also try and remember to comment lots so it's easy to understand. Thank you to all the other open source projects that do this also! It's only because of the forethought and generosity of time others have given that I've been able to learn how to do any of this.  
 
-# Non-code related
+# Plumbing
 
-* [Overview](#overview)
-* [Plumbing](#plumbing)
-* [Electronics](#electronics)
-* [Code installation](#code_installation)
-* [Ideas](#ideas)
+The plumbing setup is quite simple.
+
+![Map of plumbing and wiring](files/wiring.png)
+
+Using my existing watering system, essentially my goal was to create an intelligent hub through which the water flowed when I wanted to.
+
+To do this, the mains water goes into the manifold, where it is then stopped by the solenoids. When the solenoid is opened by the relays attached to the RPi, the water flows. By default, the relays are closed and take electric current to keep them open. This works for me because it means that in the event of a power-failure I won't flood my house.
+
+Although I felt quite confident about the plumbing side of things, one of the things I learnt through this process is that it's actually really hard to do plumbing if you care about slow drips. Also important is to consider that this is one of the few projects where you're combining water and electricity - two things that shouldn't really meet unless you're interested in entering the Darwin awards.
+
+![In order to avoid the Darwin awards, I put the solenoids in a box to contain any water explosions and splashes](/files/solenoids-in-box.jpg)
+
+My first attempt at building out the manifold used 19mm Poly pipes and joiners to connect things. This didn't work so well and burst just before I proudly demonstrated my new fool-proof internet-powered garden watering system to [Andy Carson](https://github.com/arcarson). The mains water pressure was too much for the plastic clips I used.
+
+![Attempt 1: Manifold made with Poly pipe](files/poly-pipe-manifold.png)
+
+To solve this, I decided to replace the entire manifold and feeder system with more study rigid BSP pipes and [steel screw-tightened clips](https://www.bunnings.com.au/kinetic-11-25mm-304-stainless-steel-hose-clamps_p4920192) wherever I moved into poly pipe.
+
+![Attempt 2: Proper PVC manifold and BSP threaded joiners](files/pvc-manifold.jpg)
+
+Here you can see all the pieces assembled and in their box in preparation for going into my shed.
+
+![All the pieces in one place before going into the shed](/files/all-the-pieces.jpg)
+
+Once I put this in, I found that there was then an issue with the "Nut and Tail" joints I'd used at the end of the BSP. They leaked - I even cracked the plastic on one hand-tightening it so it wasn't going to last long. In the picture below you can see the failed unit on the bottom, and the replacement on the top.
+
+![Avoid these Nut and tail joints if you can](/files/nut-and-tail.jpg)
+
+ This is because it's difficult to get a tight enough seal as the joint is made in two pieces with a washer. I solved this buy replacing the Nut and tail with a BSP female threaded joint and one piece 19mm reducers.
+
+![The final inlet/outlet pipe joins showing metal clips and one piece solid reducers](files/bsp-connectors.jpg)
+
+Once I had this all assembled, I set up a `cron` job to trigger my watering system on and off for a minute at a time in order to pressure test and rock/jerk the system around a bit. Turning water one and off with a solenoid is quite a violent process (you'll hear it - there is quite a bit of pressure involved in mains water) and I think this is what caused my first iteration to fail. Turning it on and off rapidly means you get to i) see if it leaks and ii) hopefully accelerate any failure so you can fix it before you come to rely on it working properly.
+
+# Electronics
+
+From an electronics perspective, it took me a while to figure out what was needed. Thanks to by Grove Pi kit, I had a relay, but just no real idea how to use it. Also no idea how to avoid electrocute myself.
+
+Enter many hours of youtube research and videos.
+
+Through this research I found that I'd need to do the following:
+
+![Map of electronics used](files/electronics.png)
+
+1. Connect the black wire to one of the cables from each solenoid (they have two each) and also to the transformer. This is the "power wire" and provides one half of the circuit needed to turn on the solenoid.
+2. The second wire (I chose red and white (shown as yellow) provides the "control" wire.
+3. The "control" wire is fed through the relay and then back to the second wire from the transformer. This way, when the relay is activated, the circuit is completed and the solenoid is able to activate (allowing water to flow).
+
+Because water is being used in close proximity to electricity here, I wouldn't recommend doing this unless you felt pretty confident in your knowledge. There are a few things I did to keep myself safe.
+
+1. _Most importantly:_ I did not plug in the transformer until I was sure there were no exposed wires
+2. I made sure that I put electrical tape over the ends of any exposed wires before I plugged anything in.
+3. The transformer I used for this project takes the 240VAC (240 Volts Alternating Current) found in an Australian powerpoint and drops it down to 24VAC. This is a much lower voltage (garden lights use 12VAC so that you don't die if you cut through a wire), but I'd prefer to be safer than sorry. Supposedly a 24V current can kill you if it gets under your skin.
+4. I put the solenoids (which were the piece most likely to come into direct contact with water) were inside a plastic tub. This way, if the solenoid failed or there was a leak, water wouldn't spay all over my shed, and would just dribble over the floor (turned out this safety feature was used :-) ).
+5. I ended up using these nifty [little waterproof wire connectors](https://www.bunnings.com.au/holman-wire-cable-irrigation-connectors-10-pack_p3119565). They are one used only, but flood themselves with a gel when used to create a water proof seal on the wires. This is important as although the solenoids _shouldn't_ get wet when they're being used, as I found when I flooded mine, they can sometimes.
+
+With all this in mind, I ended up with a situation like this.
+
+![Brain Box](files/brain-box.jpg)
+
+Here you can see:
+
+1. Raspberry Pi and Grove Pi board on left inside green box.
+2. Input compartment bottom right for 7 core irrigation wire.
+3. First relay connected in it's own compartment (white wires)
+4. Wires taped waiting for second relay to arrive from [Little Bird Electronics](https://littlebirdelectronics.com.au).
+5.  Temperature/humidity sensor top right (for a [seperate project](http://tagell.com/projects/kyneton-temperature-logger/))
+6.  Holes for ethernet and USB-power to come into the green box to power and control the Raspberry Pi.
 
 
-# Code installation
+# Code
+
+## Installation
 
 To get sRPinkler working you'll need to do the following on your Pi.
 
@@ -143,76 +214,3 @@ eg. Running three zones, one after the other starting at 5:01am. Zone one first 
 ```
 01 5 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1200 500 600 >> /tmp/cron_output
 ```
-
-
-
-# Plumbing
-
-The plumbing setup is quite simple.
-
-![Map of plumbing and wiring](files/wiring.png)
-
-Using my existing watering system, essentially my goal was to create an intelligent hub through which the water flowed when I wanted to.
-
-To do this, the mains water goes into the manifold, where it is then stopped by the solenoids. When the solenoid is opened by the relays attached to the RPi, the water flows. By default, the relays are closed and take electric current to keep them open. This works for me because it means that in the event of a power-failure I won't flood my house.
-
-Although I felt quite confident about the plumbing side of things, one of the things I learnt through this process is that it's actually really hard to do plumbing if you care about slow drips. Also important is to consider that this is one of the few projects where you're combining water and electricity - two things that shouldn't really meet unless you're interested in entering the Darwin awards.
-
-![In order to avoid the Darwin awards, I put the solenoids in a box to contain any water explosions and splashes](/files/solenoids-in-box.jpg)
-
-My first attempt at building out the manifold used 19mm Poly pipes and joiners to connect things. This didn't work so well and burst just before I proudly demonstrated my new fool-proof internet-powered garden watering system to [Andy Carson](https://github.com/arcarson). The mains water pressure was too much for the plastic clips I used.
-
-![Attempt 1: Manifold made with Poly pipe](files/poly-pipe-manifold.png)
-
-To solve this, I decided to replace the entire manifold and feeder system with more study rigid BSP pipes and [steel screw-tightened clips](https://www.bunnings.com.au/kinetic-11-25mm-304-stainless-steel-hose-clamps_p4920192) wherever I moved into poly pipe.
-
-![Attempt 2: Proper PVC manifold and BSP threaded joiners](files/pvc-manifold.jpg)
-
-Here you can see all the pieces assembled and in their box in preparation for going into my shed.
-
-![All the pieces in one place before going into the shed](/files/all-the-pieces.jpg)
-
-Once I put this in, I found that there was then an issue with the "Nut and Tail" joints I'd used at the end of the BSP. They leaked - I even cracked the plastic on one hand-tightening it so it wasn't going to last long. In the picture below you can see the failed unit on the bottom, and the replacement on the top.
-
-![Avoid these Nut and tail joints if you can](/files/nut-and-tail.jpg)
-
- This is because it's difficult to get a tight enough seal as the joint is made in two pieces with a washer. I solved this buy replacing the Nut and tail with a BSP female threaded joint and one piece 19mm reducers.
-
-![The final inlet/outlet pipe joins showing metal clips and one piece solid reducers](files/bsp-connectors.jpg)
-
-Once I had this all assembled, I set up a `cron` job to trigger my watering system on and off for a minute at a time in order to pressure test and rock/jerk the system around a bit. Turning water one and off with a solenoid is quite a violent process (you'll hear it - there is quite a bit of pressure involved in mains water) and I think this is what caused my first iteration to fail. Turning it on and off rapidly means you get to i) see if it leaks and ii) hopefully accelerate any failure so you can fix it before you come to rely on it working properly.
-
-# Electronics
-
-From an electronics perspective, it took me a while to figure out what was needed. Thanks to by Grove Pi kit, I had a relay, but just no real idea how to use it. Also no idea how to avoid electrocute myself.
-
-Enter many hours of youtube research and videos.
-
-Through this research I found that I'd need to do the following:
-
-![Map of electronics used](files/electronics.png)
-
-1. Connect the black wire to one of the cables from each solenoid (they have two each) and also to the transformer. This is the "power wire" and provides one half of the circuit needed to turn on the solenoid.
-2. The second wire (I chose red and white (shown as yellow) provides the "control" wire.
-3. The "control" wire is fed through the relay and then back to the second wire from the transformer. This way, when the relay is activated, the circuit is completed and the solenoid is able to activate (allowing water to flow).
-
-Because water is being used in close proximity to electricity here, I wouldn't recommend doing this unless you felt pretty confident in your knowledge. There are a few things I did to keep myself safe.
-
-1. _Most importantly:_ I did not plug in the transformer until I was sure there were no exposed wires
-2. I made sure that I put electrical tape over the ends of any exposed wires before I plugged anything in.
-3. The transformer I used for this project takes the 240VAC (240 Volts Alternating Current) found in an Australian powerpoint and drops it down to 24VAC. This is a much lower voltage (garden lights use 12VAC so that you don't die if you cut through a wire), but I'd prefer to be safer than sorry. Supposedly a 24V current can kill you if it gets under your skin.
-4. I put the solenoids (which were the piece most likely to come into direct contact with water) were inside a plastic tub. This way, if the solenoid failed or there was a leak, water wouldn't spay all over my shed, and would just dribble over the floor (turned out this safety feature was used :-) ).
-5. I ended up using these nifty [little waterproof wire connectors](https://www.bunnings.com.au/holman-wire-cable-irrigation-connectors-10-pack_p3119565). They are one used only, but flood themselves with a gel when used to create a water proof seal on the wires. This is important as although the solenoids _shouldn't_ get wet when they're being used, as I found when I flooded mine, they can sometimes.
-
-With all this in mind, I ended up with a situation like this.
-
-![Brain Box](files/brain-box.jpg)
-
-Here you can see:
-
-1. Raspberry Pi and Grove Pi board on left inside green box.
-2. Input compartment bottom right for 7 core irrigation wire.
-3. First relay connected in it's own compartment (white wires)
-4. Wires taped waiting for second relay to arrive from [Little Bird Electronics](https://littlebirdelectronics.com.au).
-5.  Temperature/humidity sensor top right (for a [seperate project](http://tagell.com/projects/kyneton-temperature-logger/))
-6.  Holes for ethernet and USB-power to come into the green box to power and control the Raspberry Pi.
