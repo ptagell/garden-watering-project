@@ -1,19 +1,18 @@
 # SRPinkler
 
-# Overview
+## Overview
 
 SRPinkler is an easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
 
 Based off the dual-premise that it is better for plants for them to be watered early in the morning and that most people don't like to wake up at 4am to water the garden, this project walks through both the code and IRL setups required to automate your garden watering.
 
-This readme is divided into several sections:
+This readme is divided into three parts excluding this overview:
 
-* [Overview - this section](#overview)
 * [Plumbing](#plumbing)
 * [Electronics](#electronics)
 * [Code](#code_installation)
 
-You will/may need:
+Depending on your set up you will/may need:
 
 * [Raspberry Pi](https://littlebirdelectronics.com.au/products/raspberry-pi-2-model-b-1)
 * [GrovePi+ board](https://www.dexterindustries.com/shop/grovepi-board/)
@@ -42,7 +41,7 @@ Still, I'd recommend this regardless. It's been great fun. I hope this helps you
 
 This document is broken into four sections for easy reference, and the code is really simple. I'll try and keep the software concerns seperate as I build this project out over time so you can pick it up and use what you need without needing to understand lots of complicated code. I'll also try and remember to comment lots so it's easy to understand. Thank you to all the other open source projects that do this also! It's only because of the forethought and generosity of time others have given that I've been able to learn how to do any of this.  
 
-# Plumbing
+## Plumbing
 
 The plumbing setup is quite simple.
 
@@ -78,7 +77,7 @@ Once I put this in, I found that there was then an issue with the "Nut and Tail"
 
 Once I had this all assembled, I set up a `cron` job to trigger my watering system on and off for a minute at a time in order to pressure test and rock/jerk the system around a bit. Turning water one and off with a solenoid is quite a violent process (you'll hear it - there is quite a bit of pressure involved in mains water) and I think this is what caused my first iteration to fail. Turning it on and off rapidly means you get to i) see if it leaks and ii) hopefully accelerate any failure so you can fix it before you come to rely on it working properly.
 
-# Electronics
+## Electronics
 
 From an electronics perspective, it took me a while to figure out what was needed. Thanks to by Grove Pi kit, I had a relay, but just no real idea how to use it. Also no idea how to avoid electrocute myself.
 
@@ -114,9 +113,9 @@ Here you can see:
 6.  Holes for ethernet and USB-power to come into the green box to power and control the Raspberry Pi.
 
 
-# Code
+## Code
 
-## Installation
+### Installation
 
 To get sRPinkler working you'll need to do the following on your Pi.
 
@@ -129,7 +128,7 @@ To get sRPinkler working you'll need to do the following on your Pi.
 7. Run `gem install bundler` followed by `bundle install` to install the required gems into the gemset you've created.
 8. Run `rvm cron setup` to enable your crontab to access the version of ruby and gemset you've created. Thanks [Daniel Schmidt](https://coderwall.com/p/vhv8aw/getting-ruby-scripts-working-with-bundler-rvm-and-cron)
 
-## Configuring your electronics and zones
+### Configuring your electronics and zones
 1. Once you've got your Ruby environment set up, it's time to configure your Grove Relays to trigger at the right times. To do this, open the file `scheduler.rb`.
 2. At the top of the files are the variables you need to configure. To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
 ```
@@ -143,7 +142,7 @@ To get sRPinkler working you'll need to do the following on your Pi.
 * Divide by the number of seconds it took and multiply by 60. eg. if it takes 43 seconds to use a litre of water.
 `1 / 43 * 60 = 1.39 litres per minute`
 
-## Notifications
+### Notifications
 
 In order to get Notifications working, you'll need to set up a [Pushover Account](#) then decide which devices you want to notify when a watering system is completed. At present notifications include the duration of watering in minutes and the volume of water used. Volume of water used is an approximation.
 
@@ -163,14 +162,14 @@ PUSHOVER_USER_KEY=userkeygoeshere
 
 
 
-### Test notifications
+#### Test notifications
 Test notifications by opening your terminal and running:
 
 `cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 2 >> /tmp/cron_output`
 
 Note: this will turn on your garden watering for 2 seconds, then submit a notification to pushover. If it doesn't work, there is probably an error either in your `.env` file or your pushover implementation. The other issue I have run into many times is that the environment in which `cron` runs does not have access to your gems (and hence can't get to the `.env` file using the `dotenv` gem). The only way I found to resolve this was to follow the RVM related steps above.
 
-## Test watering
+### Test watering
 
 I would strongly recommend doing a test watering once you've got to this point. I'd also suggest testing in a way that will pump the pipes quite hard to make sure that, if something is going to break, it breaks while you're testing it and not once you go on holidays for a week (and flood your house).
 
@@ -191,7 +190,7 @@ If you have two zone (runs every second minute)
 Let the script run for 10-20 minutes. Press `CTRL+C` to kill the script (make sure you're in a break period when you do this or you'll need to hard reset)
 
 
-## Setting up ongoing automatic watering.
+### Setting up ongoing automatic watering.
 1. From terminal, type `crontab -e` to edit your crontab file (`crontab` runs tasks every minute on a schedule you specify).
 2. Read through the example crontabs below. Pick one, modify it to suit your needs, then paste the following into the `crontab`. Make sure there is a new line at the end of it. These lines should go immediately after the lines added by `RVM`.
 
