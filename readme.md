@@ -10,7 +10,7 @@ This readme is divided into three parts excluding this overview:
 
 * [Plumbing](#plumbing)
 * [Electronics](#electronics)
-* [Code](#code_installation)
+* [Code](#code)
 
 Depending on your set up you will/may need:
 
