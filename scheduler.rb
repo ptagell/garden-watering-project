@@ -3,29 +3,115 @@ require "net/https"
 # required to access .env variables
 require 'dotenv/load'
 
+#required for predictive watering based off weather.
+require 'date'
+require 'json'
+require 'time'
+require 'open-uri'
+
 # This file is responsible for controlling when the `water.py` script is invoked.
 
 # zone 1 settings
 @zone_1_friendly_name = "Back Garden"
 @zone_1_flow_rate = "20"
 @zone_1_relay = 5
+@zone_1_moisture_sensor_present = true
+@zone_1_full_water_rate = 1200
 @zone_1_duration = ARGV[0]
+
 # zone 2 settings
 @zone_2_friendly_name = "Front Garden"
 @zone_2_flow_rate = "1.25"
 @zone_2_relay = 4
+@zone_2_moisture_sensor_present = false
+@zone_2_full_water_rate = 4000
 @zone_2_duration = ARGV[1]
+
 # zone 3 settings
 @zone_3_friendly_name = "Wicking Beds"
 @zone_3_flow_rate = "20"
 @zone_3_relay = 3
+@zone_3_moisture_sensor_present = false
+@zone_3_full_water_rate = 0
 @zone_3_duration = ARGV[2]
 
 @number_of_zones_to_water = ARGV.count
 @session_start_time = Time.now.localtime
+@weather_modifier = 100%
 
 # duration of sleep (needed for resets)
 @sleep_duration = 1
+
+def retrieve_soil_moisture_data
+  for i in 1..@number_of_zones_to_water do
+    target_zone = instance_variable_get("@zone_"+i.to_s+"_moisture_sensor_present")
+    if target_zone == true
+      # note - will need to target specific zones for their moisture.
+      zone_moisture_level = `python /Users/paultagell/Sites/moisture_sensor/grove_moisture_sensor.py`.to_i
+      if zone_moisture_level.between?(200, 900)
+        # no watering needed.
+        # do not water zone.
+        puts Time.now.localtime.to_s+" Stopping. No need to water as ground is at "+zone_moisture_level.to_s
+
+      elsif zone_moisture_level.between?(100, 199)
+        puts "between 100 and 200"
+        retrieve_weather_data
+        # expect percentage as return value. This could be a float.
+        duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate") * weather_modifier * 75%
+
+        # Light watering needed (1000 seconds)
+          # will it rain in the next day. Invoke retieve weather data to return a condition,.
+        # pass light watering value to zone n's relay value.
+
+      elsif zone_moisture_level.between?(0, 99)
+        puts "between 0 and 100"
+        # heavy watering needed.
+        retrieve_weather_data
+        duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate") * weather_modifier * 100%
+
+      end
+    end
+  end
+end
+
+def retrieve_weather_data
+  puts Time.now.localtime.to_s+" Connecting to the weather underground to retrieve todays weather history"
+  date = Date.today.strftime('%Y%m%d')
+  url = "http://api.wunderground.com/api/545b187066a10a63/forecast"+"/geolookup/q/pws:IVICKYNE2.json"
+  open(url) do |f|
+    json_string = f.read
+    @parsed_json = JSON.parse(json_string)
+  end
+  puts "finished"
+  # puts @parsed_json['forecast']['simpleforecast']['forecastday']["pop"].to_s
+  chance_of_rain = @parsed_json['forecast']['simpleforecast']['forecastday'][0]['pop'].to_i
+  amount_of_rain = @parsed_json['forecast']['simpleforecast']['forecastday'][0]['qpf_allday']['mm'].to_i
+  puts chance_of_rain
+  puts amount_of_rain
+  if chance_of_rain <= 80
+    puts "between 0 and 80"
+    if amount_of_rain >= 10
+      #there is a low chance of rain, but if it does rain, it'll rain a lot
+      weather_modifier = 75
+      puts weather_modifier
+    else
+      #there is a low chance of rain, and even if it does rain, it won't rain much.
+      weather_modifier = 100
+      puts weather_modifier
+    end
+  else
+    puts "between 81 and 100"
+    if amount_of_rain >= 10
+      #there's a high chance of rain, and if it does rain, it's going to rain a lot
+      weather_modifier = 0
+      puts weather_modifier
+    else
+      #there's a high chance of rain, but even if it does rain, it's not going to rain much
+      weather_modifier = 50
+      puts weather_modifier
+    end
+  end
+end
 
 # I stumbled across an issue whereby the GrovePi would need resetting (RST light woudl activate). This line resets the GrovePi before trying to run any commands with it. Important to do it before each watering session to increase the chances it doesn't fail during the watering session (and keep watering...watering...watering)
 def grove_reset
@@ -97,6 +183,14 @@ def notify
   end
 end
 
-water_by_zone
-report
-notify
+retrieve_soil_moisture_data
+#
+# water_by_zone
+# report
+# notify
+
+
+
+
+if params exist, use params.
+  If no params exist, use auto-watering settings.
