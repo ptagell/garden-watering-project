@@ -13,7 +13,7 @@ require 'open-uri'
 # How many zones will your garden have?
 zones_to_water = 3
 # What is the absolute path to this project on your Rasberry Pi
-@path_to_project = "/Users/paultagell/Sites/garden-watering-project/"
+
 
 # zone 1 settings
 @zone_1_friendly_name = "Back Garden"
@@ -53,11 +53,12 @@ end
 
 # duration of sleep (needed for resets)
 @sleep_duration = 1
+@path_to_project = ENV['PATH_TO_PROJECT']
 
 def retrieve_weather_data
   puts Time.now.localtime.to_s+" Connecting to the weather underground to retrieve todays weather history"
   date = Date.today.strftime('%Y%m%d')
-  url = "http://api.wunderground.com/api/545b187066a10a63/forecast"+"/geolookup/q/pws:IVICKYNE2.json"
+  url = "http://api.wunderground.com/api/#{ENV['WEATHER_UNDERGROUND_KEY']}/forecast"+"/geolookup/q/pws:IVICKYNE2.json"
   open(url) do |f|
     json_string = f.read
     @parsed_json = JSON.parse(json_string)
