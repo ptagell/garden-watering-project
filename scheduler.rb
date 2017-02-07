@@ -172,6 +172,8 @@ end
 
 # ================ RUN SCRIPTS ===============
 
+puts "\n\n Today's weather report \n\n\n"
+
 retrieve_weather_data
 
 if @auto_water == true
@@ -194,10 +196,14 @@ if @auto_water == true
 else
   # water based off parameters instead of autowater
   for i in 1..@number_of_zones_to_water do
+    friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
+    puts "\n\n Beginning "+friendly_name+"\n\n\n"
     duration = instance_variable_get("@zone_"+i.to_s+"_duration")
     water_by_zone(i, duration)
   end
 end
+
+puts "\n\n Running Reports \n\n\n"
 
 report
 notify
