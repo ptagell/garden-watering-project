@@ -18,7 +18,7 @@ zones_to_water = 3
 # zone 1 settings
 @zone_1_friendly_name = "Back Garden"
 @zone_1_flow_rate = "20"
-@zone_1_relay = 5
+@zone_1_relay = 4
 @zone_1_moisture_sensor_present = true
 @zone_1_moisture_sensor_relay = 0
 @zone_1_full_water_rate = 1200
@@ -27,7 +27,7 @@ zones_to_water = 3
 # zone 2 settings
 @zone_2_friendly_name = "Front Garden"
 @zone_2_flow_rate = "1.25"
-@zone_2_relay = 4
+@zone_2_relay = 5
 @zone_2_moisture_sensor_present = false
 @zone_2_full_water_rate = 7200
 @zone_2_duration = ARGV[1]

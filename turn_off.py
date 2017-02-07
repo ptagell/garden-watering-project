@@ -14,3 +14,8 @@ grovepi.pinMode(relay,"OUTPUT")
 print ("Ending...turning off water")
 grovepi.digitalWrite(relay,0)
 print ("Water is off")
+
+relay = 4
+
+grovepi.pinMode(relay,"OUTPUT")
+grovepi.digitalWrite(relay,0)
