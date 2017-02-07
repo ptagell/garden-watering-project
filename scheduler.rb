@@ -2,7 +2,6 @@
 require "net/https"
 # required to access .env variables
 require 'dotenv/load'
-
 #required for predictive watering based off weather.
 require 'date'
 require 'json'
@@ -11,11 +10,17 @@ require 'open-uri'
 
 # This file is responsible for controlling when the `water.py` script is invoked.
 
+# How many zones will your garden have?
+zones_to_water = 3
+# What is the absolute path to this project on your Rasberry Pi
+@path_to_project = "/Users/paultagell/Sites/garden-watering-project/"
+
 # zone 1 settings
 @zone_1_friendly_name = "Back Garden"
 @zone_1_flow_rate = "20"
 @zone_1_relay = 5
 @zone_1_moisture_sensor_present = true
+@zone_1_moisture_sensor_relay = 0
 @zone_1_full_water_rate = 1200
 @zone_1_duration = ARGV[0]
 
@@ -24,7 +29,7 @@ require 'open-uri'
 @zone_2_flow_rate = "1.25"
 @zone_2_relay = 4
 @zone_2_moisture_sensor_present = false
-@zone_2_full_water_rate = 4000
+@zone_2_full_water_rate = 7200
 @zone_2_duration = ARGV[1]
 
 # zone 3 settings
@@ -35,44 +40,19 @@ require 'open-uri'
 @zone_3_full_water_rate = 0
 @zone_3_duration = ARGV[2]
 
-@number_of_zones_to_water = ARGV.count
 @session_start_time = Time.now.localtime
-@weather_modifier = 100%
+@weather_modifier = 1.0 #default weather modifier value
+
+if ARGV.count == 0
+  @number_of_zones_to_water = zones_to_water
+  @auto_water = true
+else
+  @number_of_zones_to_water = ARGV.count
+  @auto_water = false
+end
 
 # duration of sleep (needed for resets)
 @sleep_duration = 1
-
-def retrieve_soil_moisture_data
-  for i in 1..@number_of_zones_to_water do
-    target_zone = instance_variable_get("@zone_"+i.to_s+"_moisture_sensor_present")
-    if target_zone == true
-      # note - will need to target specific zones for their moisture.
-      zone_moisture_level = `python /Users/paultagell/Sites/moisture_sensor/grove_moisture_sensor.py`.to_i
-      if zone_moisture_level.between?(200, 900)
-        # no watering needed.
-        # do not water zone.
-        puts Time.now.localtime.to_s+" Stopping. No need to water as ground is at "+zone_moisture_level.to_s
-
-      elsif zone_moisture_level.between?(100, 199)
-        puts "between 100 and 200"
-        retrieve_weather_data
-        # expect percentage as return value. This could be a float.
-        duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate") * weather_modifier * 75%
-
-        # Light watering needed (1000 seconds)
-          # will it rain in the next day. Invoke retieve weather data to return a condition,.
-        # pass light watering value to zone n's relay value.
-
-      elsif zone_moisture_level.between?(0, 99)
-        puts "between 0 and 100"
-        # heavy watering needed.
-        retrieve_weather_data
-        duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate") * weather_modifier * 100%
-
-      end
-    end
-  end
-end
 
 def retrieve_weather_data
   puts Time.now.localtime.to_s+" Connecting to the weather underground to retrieve todays weather history"
@@ -82,35 +62,45 @@ def retrieve_weather_data
     json_string = f.read
     @parsed_json = JSON.parse(json_string)
   end
-  puts "finished"
-  # puts @parsed_json['forecast']['simpleforecast']['forecastday']["pop"].to_s
+  puts Time.now.localtime.to_s+" Finished retrieving forecast"
+  puts Time.now.localtime.to_s+" Extracting relevant data from forecast"
   chance_of_rain = @parsed_json['forecast']['simpleforecast']['forecastday'][0]['pop'].to_i
   amount_of_rain = @parsed_json['forecast']['simpleforecast']['forecastday'][0]['qpf_allday']['mm'].to_i
-  puts chance_of_rain
-  puts amount_of_rain
   if chance_of_rain <= 80
-    puts "between 0 and 80"
     if amount_of_rain >= 10
-      #there is a low chance of rain, but if it does rain, it'll rain a lot
-      weather_modifier = 75
-      puts weather_modifier
+      puts Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, but if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
+      @weather_modifier = 0.75
     else
-      #there is a low chance of rain, and even if it does rain, it won't rain much.
-      weather_modifier = 100
-      puts weather_modifier
+      puts Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, and even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
+      @weather_modifier = 1.0
     end
   else
-    puts "between 81 and 100"
     if amount_of_rain >= 10
-      #there's a high chance of rain, and if it does rain, it's going to rain a lot
-      weather_modifier = 0
-      puts weather_modifier
+      puts Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, and if it does rain, it's predicted to rain around "+amount_of_rain.to_s+"mm"
+      @weather_modifier = 0
     else
-      #there's a high chance of rain, but even if it does rain, it's not going to rain much
-      weather_modifier = 50
-      puts weather_modifier
+      puts Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, but even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
+      @weather_modifier = 0.5
     end
   end
+  puts Time.now.localtime.to_s+" Setting weather modifier to "+@weather_modifier.to_s
+end
+
+
+def retrieve_soil_moisture_data(i)
+      # note - will need to target specific zones for their moisture.
+    zone_moisture_level = `python #{@path_to_project}grove_moisture_sensor.py`.to_i
+    if zone_moisture_level >= 200 && zone_moisture_level <= 900
+      puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
+    elsif zone_moisture_level >= 100 && zone_moisture_level <= 199
+      puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
+      duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
+      water_by_zone(i, duration)
+    elsif zone_moisture_level >=0 && zone_moisture_level <= 99
+      puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
+      duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
+      water_by_zone(i, duration)
+    end
 end
 
 # I stumbled across an issue whereby the GrovePi would need resetting (RST light woudl activate). This line resets the GrovePi before trying to run any commands with it. Important to do it before each watering session to increase the chances it doesn't fail during the watering session (and keep watering...watering...watering)
@@ -124,27 +114,23 @@ end
 # Turn on the watering system using the Python controller code for the Grove Relay.
 # Note: this code only works for one watering zone at present.
 def water_garden(relay, duration)
-  puts Time.now.localtime.to_s+" Turning on watering system"
+  puts Time.now.localtime.to_s+" Turning on watering system for "+duration.to_s+" seconds"
   # Run Watering.py script for duration specified.
   # system("python water.py #{relay} #{duration}")
-  system("python /home/pi/Projects/garden-watering-project/water.py #{relay} #{duration}")
+  system("python #{@path_to_project}water.py #{relay} #{duration.to_i}")
   puts Time.now.localtime.to_s+" Turning off watering system"
 end
 
-def water_by_zone
-  for i in 1..@number_of_zones_to_water do
-    relay = instance_variable_get("@zone_"+i.to_s+"_relay")
-    duration = instance_variable_get("@zone_"+i.to_s+"_duration")
-    if duration.to_i != 0
-      # grove_reset
-      puts Time.now.localtime.to_s+" Session start time is "+@session_start_time.to_s
-      water_garden(relay, duration)
-      # grove_reset
-      puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" done"
-    elsif duration.to_i == 0
-      puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" skipped as no zero specified"
-    end
-    puts "\n\n===== MOVING TO NEXT ZONE =====\n\n\n"
+def water_by_zone(i, duration)
+  relay = instance_variable_get("@zone_"+i.to_s+"_relay")
+  if duration.to_i != 0
+    # grove_reset
+    puts Time.now.localtime.to_s+" Session start time"
+    water_garden(relay, duration)
+    # grove_reset
+    puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" done"
+  elsif duration.to_i == 0
+    puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" skipped as no duration specified"
   end
 end
 
@@ -183,14 +169,35 @@ def notify
   end
 end
 
-retrieve_soil_moisture_data
-#
-# water_by_zone
-# report
-# notify
 
+# ================ RUN SCRIPTS ===============
 
+retrieve_weather_data
 
+if @auto_water == true
+  puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
+  for i in 1..@number_of_zones_to_water do
 
-if params exist, use params.
-  If no params exist, use auto-watering settings.
+    target_zone_has_sensor = instance_variable_get("@zone_"+i.to_s+"_moisture_sensor_present")
+    friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
+    puts "\n\n Beginning "+friendly_name+"\n\n\n"
+    if target_zone_has_sensor == true
+      puts Time.now.localtime.to_s+" "+friendly_name+" has a moisture sensor"
+      retrieve_soil_moisture_data(i)
+    else
+      puts Time.now.localtime.to_s+" Target zone does not have a moisture sensor."
+      duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate").to_f*@weather_modifier.to_f
+      puts Time.now.localtime.to_s+" Using default watering settings for this zone."
+      water_by_zone(i, duration)
+    end
+  end
+else
+  # water based off parameters instead of autowater
+  for i in 1..@number_of_zones_to_water do
+    duration = instance_variable_get("@zone_"+i.to_s+"_duration")
+    water_by_zone(i, duration)
+  end
+end
+
+report
+notify
