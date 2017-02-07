@@ -8,17 +8,15 @@ require 'json'
 require 'time'
 require 'open-uri'
 
-# This file is responsible for controlling when the `water.py` script is invoked.
-
+# This file is responsible, along with .env, for controlling when the `water.py` script is invoked.
 # How many zones will your garden have?
-zones_to_water = 3
+zones_to_water = ENV['ZONES_TO_WATER']
 # What is the absolute path to this project on your Rasberry Pi
-
 
 # zone 1 settings
 @zone_1_friendly_name = "Back Garden"
 @zone_1_flow_rate = "20"
-@zone_1_relay = 5
+@zone_1_relay = ENV['ZONE_1_RELAY']
 @zone_1_moisture_sensor_present = true
 @zone_1_moisture_sensor_relay = 0
 @zone_1_full_water_rate = 1200
@@ -27,7 +25,7 @@ zones_to_water = 3
 # zone 2 settings
 @zone_2_friendly_name = "Front Garden"
 @zone_2_flow_rate = "1.25"
-@zone_2_relay = 4
+@zone_2_relay = ENV['ZONE_2_RELAY']
 @zone_2_moisture_sensor_present = false
 @zone_2_full_water_rate = 7200
 @zone_2_duration = ARGV[1]
@@ -170,13 +168,9 @@ def notify
   end
 end
 
-
 # ================ RUN SCRIPTS ===============
-
 puts "\n\n Today's weather report \n\n\n"
-
 retrieve_weather_data
-
 if @auto_water == true
   puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
   for i in 1..@number_of_zones_to_water do
@@ -205,6 +199,5 @@ else
 end
 
 puts "\n\n Running Reports \n\n\n"
-
 report
 notify
