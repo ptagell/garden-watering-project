@@ -9,27 +9,21 @@ import sys
 import time
 import grovepi
 
-print ("===== IN PYTHON =====")
-
 # Accept parameters from Ruby/Command line and store for watering session
 # Relay and Duration from Parameters
 relay = int(sys.argv[1:][0])
-print relay
 duration = int(sys.argv[1:][1])
-print duration
 grovepi.pinMode(relay,"OUTPUT")
 
-print ("Attempting to turn on the water")
+print ("PYTHON: Attempting to turn on the water")
 # Turn the relay to the on position
 grovepi.digitalWrite(relay,1)
 # Confirm the water is on. Note: Not sure how to verify this without some sort of flow sensor.
-print ("Water is on")
+print ("PYTHON: Water is on")
 # This is the duration of watering in seconds.
 time.sleep(duration)
 
-print ("Ending...trying to turning off water")
+print ("PYTHON: Ending...trying to turning off water")
 # Turn the relay off.
 grovepi.digitalWrite(relay,0)
-print ("Water is off")
-
-print ("===== LEAVING PYTHON =====")
+print ("PYTHON: Water is off")

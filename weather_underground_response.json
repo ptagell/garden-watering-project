@@ -1,0 +1,816 @@
+
+{
+  "response": {
+  "version":"0.1",
+  "termsofService":"http://www.wunderground.com/weather/api/d/terms.html",
+  "features": {
+  "forecast": 1
+  ,
+  "geolookup": 1
+  }
+	}
+		,	"location": {
+		"type":"INTLCITY",
+		"country":"AU",
+		"country_iso3166":"AU",
+		"country_name":"Australia",
+		"state":"VCT",
+		"city":"Kyneton",
+		"tz_short":"AEDT",
+		"tz_long":"Australia/Sydney",
+		"lat":"-37.249523",
+		"lon":"144.466034",
+		"zip":"00000",
+		"magic":"11",
+		"wmo":"94859",
+		"l":"/q/zmw:00000.11.94859",
+		"requesturl":"global/stations/94859.html",
+		"wuiurl":"https://www.wunderground.com/global/stations/94859.html",
+		"nearby_weather_stations": {
+		"airport": {
+		"station": [
+		{ "city":"Redesdale Aws", "state":"", "country":"Australia", "icao":"", "lat":"-37.01940155", "lon":"144.52029419" }
+		,{ "city":"Melbourne Airport", "state":"", "country":"AU", "icao":"YMML", "lat":"-37.66999817", "lon":"144.83000183" }
+		,{ "city":"", "state":"", "country":"", "icao":"", "lat":"", "lon":"" }
+		,{ "city":"", "state":"", "country":"", "icao":"", "lat":"", "lon":"" }
+		]
+		}
+		,
+		"pws": {
+		"station": [
+		{
+		"neighborhood":"Kyneton East (Town)",
+		"city":"Kyneton",
+		"state":"VIC",
+		"country":"AU",
+		"id":"IVICKYNE2",
+		"lat":-37.249523,
+		"lon":144.466034,
+		"distance_km":0,
+		"distance_mi":0
+		},
+		{
+		"neighborhood":"Kyneton East (Town)",
+		"city":"Kyneton",
+		"state":"VIC",
+		"country":"AU",
+		"id":"IVICKYNE2",
+		"lat":-37.249523,
+		"lon":144.466034,
+		"distance_km":0,
+		"distance_mi":0
+		},
+		{
+		"neighborhood":"Kyneton",
+		"city":"Kyneton",
+		"state":"Victoria",
+		"country":"AU",
+		"id":"IVICTORI113",
+		"lat":-37.250782,
+		"lon":144.478867,
+		"distance_km":1,
+		"distance_mi":0
+		},
+		{
+		"neighborhood":"Kyneton (Flynns Lane)",
+		"city":"Kyneton",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI777",
+		"lat":-37.253632,
+		"lon":144.434647,
+		"distance_km":2,
+		"distance_mi":1
+		},
+		{
+		"neighborhood":"YKTN",
+		"city":"Victoria",
+		"state":"",
+		"country":"AU",
+		"id":"IVICTORI1161",
+		"lat":-37.225666,
+		"lon":144.447723,
+		"distance_km":3,
+		"distance_mi":1
+		},
+		{
+		"neighborhood":"Kyneton Resort",
+		"city":"Kyneton",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI192",
+		"lat":-37.221298,
+		"lon":144.470596,
+		"distance_km":3,
+		"distance_mi":1
+		},
+		{
+		"neighborhood":"Angus @ Verekers lane",
+		"city":"Kyneton",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI585",
+		"lat":-37.215828,
+		"lon":144.486603,
+		"distance_km":4,
+		"distance_mi":2
+		},
+		{
+		"neighborhood":"upperMalmsbury",
+		"city":"Malmsbury",
+		"state":"",
+		"country":"AU",
+		"id":"IMALMSBU2",
+		"lat":-37.188473,
+		"lon":144.390259,
+		"distance_km":9,
+		"distance_mi":5
+		},
+		{
+		"neighborhood":"Tylden",
+		"city":"Tylden",
+		"state":"",
+		"country":"AU",
+		"id":"ITYLDEN2",
+		"lat":-37.323555,
+		"lon":144.405914,
+		"distance_km":9,
+		"distance_mi":5
+		},
+		{
+		"neighborhood":"Newham",
+		"city":"Newham",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI907",
+		"lat":-37.274948,
+		"lon":144.595245,
+		"distance_km":11,
+		"distance_mi":7
+		},
+		{
+		"neighborhood":"Drummond",
+		"city":"Victoria",
+		"state":"",
+		"country":"AU",
+		"id":"IVICTORI1168",
+		"lat":-37.241287,
+		"lon":144.328568,
+		"distance_km":12,
+		"distance_mi":7
+		},
+		{
+		"neighborhood":"Woodend West",
+		"city":"Woodend",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI1036",
+		"lat":-37.357895,
+		"lon":144.497162,
+		"distance_km":12,
+		"distance_mi":7
+		},
+		{
+		"neighborhood":"Woodend",
+		"city":"Woodend",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI792",
+		"lat":-37.358437,
+		"lon":144.505875,
+		"distance_km":12,
+		"distance_mi":7
+		},
+		{
+		"neighborhood":"Woodend",
+		"city":"Woodend",
+		"state":"",
+		"country":"AU",
+		"id":"IWOODEND2",
+		"lat":-37.363003,
+		"lon":144.520966,
+		"distance_km":13,
+		"distance_mi":8
+		},
+		{
+		"neighborhood":"Taradale",
+		"city":"Taradale",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI1132",
+		"lat":-37.151890,
+		"lon":144.371262,
+		"distance_km":13,
+		"distance_mi":8
+		},
+		{
+		"neighborhood":"Woodend, Victoria, Australia",
+		"city":"Woodend",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI918",
+		"lat":-37.358833,
+		"lon":144.539261,
+		"distance_km":13,
+		"distance_mi":8
+		},
+		{
+		"neighborhood":"Rural",
+		"city":"Hesket",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI923",
+		"lat":-37.355770,
+		"lon":144.640305,
+		"distance_km":19,
+		"distance_mi":11
+		},
+		{
+		"neighborhood":"Hesket",
+		"city":"Hesket",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI369",
+		"lat":-37.365978,
+		"lon":144.634903,
+		"distance_km":19,
+		"distance_mi":11
+		},
+		{
+		"neighborhood":"Victoria Street",
+		"city":"Macedon",
+		"state":"VIC",
+		"country":"AU",
+		"id":"IVICMACE2",
+		"lat":-37.423100,
+		"lon":144.562637,
+		"distance_km":21,
+		"distance_mi":12
+		},
+		{
+		"neighborhood":"Amelia Lane",
+		"city":"Trentham",
+		"state":"VIC",
+		"country":"AU",
+		"id":"IVICTREN2",
+		"lat":-37.416977,
+		"lon":144.299118,
+		"distance_km":23,
+		"distance_mi":14
+		},
+		{
+		"neighborhood":"Daylesford",
+		"city":"Mount Franklin",
+		"state":"Victoria",
+		"country":"AU",
+		"id":"IVICTORI347",
+		"lat":-37.260944,
+		"lon":144.177216,
+		"distance_km":25,
+		"distance_mi":15
+		},
+		{
+		"neighborhood":"Romsey Victoria",
+		"city":"Romsey",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI614",
+		"lat":-37.339855,
+		"lon":144.740677,
+		"distance_km":26,
+		"distance_mi":15
+		},
+		{
+		"neighborhood":"\u0027CASTANOLEA\u0027 @ Musk, Victoria",
+		"city":"Musk",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI544",
+		"lat":-37.365376,
+		"lon":144.190704,
+		"distance_km":27,
+		"distance_mi":16
+		},
+		{
+		"neighborhood":"Riddells Creek",
+		"city":"Riddells Creek",
+		"state":"",
+		"country":"AU",
+		"id":"IRIDDELL2",
+		"lat":-37.435169,
+		"lon":144.673248,
+		"distance_km":27,
+		"distance_mi":16
+		},
+		{
+		"neighborhood":"Blackwood",
+		"city":"Blackwood",
+		"state":"VICTORIA",
+		"country":"AU",
+		"id":"IVICTORI797",
+		"lat":-37.472683,
+		"lon":144.306213,
+		"distance_km":28,
+		"distance_mi":17
+		},
+		{
+		"neighborhood":"Campbells Creek",
+		"city":"Campbells Creek",
+		"state":"VIC",
+		"country":"AU",
+		"id":"IVICCAMP2",
+		"lat":-37.087574,
+		"lon":144.214569,
+		"distance_km":28,
+		"distance_mi":17
+		},
+		{
+		"neighborhood":"Forest",
+		"city":"Victoria",
+		"state":"",
+		"country":"AU",
+		"id":"IVICTORI1181",
+		"lat":-37.024410,
+		"lon":144.304459,
+		"distance_km":28,
+		"distance_mi":17
+		},
+		{
+		"neighborhood":"Swiss Mount Avenue",
+		"city":"Elevated Plains",
+		"state":"VIC",
+		"country":"AU",
+		"id":"IVICELEV2",
+		"lat":-37.316540,
+		"lon":144.137070,
+		"distance_km":30,
+		"distance_mi":18
+		},
+		{
+		"neighborhood":"Wombat Hill",
+		"city":"Daylesford",
+		"state":"",
+		"country":"AU",
+		"id":"IDAYLESF2",
+		"lat":-37.347340,
+		"lon":144.149323,
+		"distance_km":30,
+		"distance_mi":18
+		},
+		{
+		"neighborhood":"Kyneton",
+		"city":"Kyneton",
+		"state":"VCT",
+		"country":"AU",
+		"id":"IVCTKYNE2",
+		"lat":-37.236210,
+		"lon":144.449112,
+		"distance_km":2,
+		"distance_mi":1
+		},
+		{
+		"neighborhood":"Macedon",
+		"city":"Macedon",
+		"state":"",
+		"country":"AU",
+		"id":"IMACEDON8",
+		"lat":-37.419498,
+		"lon":144.566177,
+		"distance_km":20,
+		"distance_mi":12
+		},
+		{
+		"neighborhood":"Drummond",
+		"city":"Drummond North",
+		"state":"",
+		"country":"AU",
+		"id":"IDRUMMON3",
+		"lat":-37.220543,
+		"lon":144.295547,
+		"distance_km":15,
+		"distance_mi":9
+		},
+		{
+		"neighborhood":"Macedon",
+		"city":"Mount Macedon",
+		"state":"VCT",
+		"country":"AU",
+		"id":"IVCTMOUN2",
+		"lat":-37.379295,
+		"lon":144.598557,
+		"distance_km":18,
+		"distance_mi":11
+		},
+		{
+		"neighborhood":"Mount Macedon Road",
+		"city":"Mount Macedon",
+		"state":"VIC",
+		"country":"AU",
+		"id":"IVICMOUN11",
+		"lat":-37.415073,
+		"lon":144.585129,
+		"distance_km":21,
+		"distance_mi":12
+		},
+		{
+		"neighborhood":"Gisborne",
+		"city":"Sunbury",
+		"state":"",
+		"country":"AU",
+		"id":"ISUNBURY8",
+		"lat":-37.478447,
+		"lon":144.583603,
+		"distance_km":27,
+		"distance_mi":16
+		}
+		]
+		}
+		}
+	}
+		,
+	"forecast":{
+		"txt_forecast": {
+		"date":"8:02 PM AEDT",
+		"forecastday": [
+		{
+		"period":0,
+		"icon":"partlycloudy",
+		"icon_url":"http://icons.wxug.com/i/c/k/partlycloudy.gif",
+		"title":"Monday",
+		"fcttext":"Partly cloudy. Lows overnight in the upper 40s.",
+		"fcttext_metric":"Partly cloudy. Low 8C.",
+		"pop":"10"
+		}
+		,
+		{
+		"period":1,
+		"icon":"nt_partlycloudy",
+		"icon_url":"http://icons.wxug.com/i/c/k/nt_partlycloudy.gif",
+		"title":"Monday Night",
+		"fcttext":"Partly cloudy skies. Low 47F. Winds SSE at 15 to 25 mph.",
+		"fcttext_metric":"Some clouds this evening will give way to mainly clear skies overnight. Low 8C. Winds SSE at 25 to 40 km/h.",
+		"pop":"10"
+		}
+		,
+		{
+		"period":2,
+		"icon":"clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/clear.gif",
+		"title":"Tuesday",
+		"fcttext":"Sunny. High 77F. Winds SSE at 10 to 20 mph.",
+		"fcttext_metric":"Sunny. High near 25C. Winds SSE at 15 to 30 km/h.",
+		"pop":"10"
+		}
+		,
+		{
+		"period":3,
+		"icon":"nt_clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/nt_clear.gif",
+		"title":"Tuesday Night",
+		"fcttext":"A mostly clear sky. Low 57F. SSE winds shifting to ENE at 10 to 20 mph.",
+		"fcttext_metric":"A mostly clear sky. Low around 15C. SSE winds shifting to NE at 15 to 30 km/h.",
+		"pop":"10"
+		}
+		,
+		{
+		"period":4,
+		"icon":"clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/clear.gif",
+		"title":"Wednesday",
+		"fcttext":"Mainly sunny. High 87F. Winds NNE at 10 to 20 mph.",
+		"fcttext_metric":"A mainly sunny sky. High near 30C. Winds NNE at 15 to 30 km/h.",
+		"pop":"10"
+		}
+		,
+		{
+		"period":5,
+		"icon":"nt_clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/nt_clear.gif",
+		"title":"Wednesday Night",
+		"fcttext":"Clear. Low 66F. Winds NNE at 10 to 15 mph.",
+		"fcttext_metric":"Clear. Low 19C. Winds NNE at 15 to 25 km/h.",
+		"pop":"0"
+		}
+		,
+		{
+		"period":6,
+		"icon":"clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/clear.gif",
+		"title":"Thursday",
+		"fcttext":"Plentiful sunshine. High 94F. Winds N at 10 to 20 mph.",
+		"fcttext_metric":"Sunny. High 34C. Winds N at 15 to 30 km/h.",
+		"pop":"0"
+		}
+		,
+		{
+		"period":7,
+		"icon":"nt_partlycloudy",
+		"icon_url":"http://icons.wxug.com/i/c/k/nt_partlycloudy.gif",
+		"title":"Thursday Night",
+		"fcttext":"Clear to partly cloudy. Low 64F. Winds S at 5 to 10 mph.",
+		"fcttext_metric":"Partly cloudy skies. Low 16C. Winds SSE at 10 to 15 km/h.",
+		"pop":"0"
+		}
+		]
+		},
+		"simpleforecast": {
+		"forecastday": [
+		{"date":{
+	"epoch":"1486368000",
+	"pretty":"7:00 PM AEDT on February 06, 2017",
+	"day":6,
+	"month":2,
+	"year":2017,
+	"yday":36,
+	"hour":19,
+	"min":"00",
+	"sec":0,
+	"isdst":"1",
+	"monthname":"February",
+	"monthname_short":"Feb",
+	"weekday_short":"Mon",
+	"weekday":"Monday",
+	"ampm":"PM",
+	"tz_short":"AEDT",
+	"tz_long":"Australia/Sydney"
+},
+		"period":1,
+		"high": {
+		"fahrenheit":"64",
+		"celsius":"17"
+		},
+		"low": {
+		"fahrenheit":"47",
+		"celsius":"8"
+		},
+		"conditions":"Partly Cloudy",
+		"icon":"partlycloudy",
+		"icon_url":"http://icons.wxug.com/i/c/k/partlycloudy.gif",
+		"skyicon":"",
+		"pop":10,
+		"qpf_allday": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"qpf_day": {
+		"in": null,
+		"mm": null
+		},
+		"qpf_night": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"snow_allday": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"snow_day": {
+		"in": null,
+		"cm": null
+		},
+		"snow_night": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"maxwind": {
+		"mph": 27,
+		"kph": 43,
+		"dir": "",
+		"degrees": 0
+		},
+		"avewind": {
+		"mph": 7,
+		"kph": 12,
+		"dir": "SE",
+		"degrees": 137
+		},
+		"avehumidity": 84,
+		"maxhumidity": 0,
+		"minhumidity": 0
+		}
+		,
+		{"date":{
+	"epoch":"1486454400",
+	"pretty":"7:00 PM AEDT on February 07, 2017",
+	"day":7,
+	"month":2,
+	"year":2017,
+	"yday":37,
+	"hour":19,
+	"min":"00",
+	"sec":0,
+	"isdst":"1",
+	"monthname":"February",
+	"monthname_short":"Feb",
+	"weekday_short":"Tue",
+	"weekday":"Tuesday",
+	"ampm":"PM",
+	"tz_short":"AEDT",
+	"tz_long":"Australia/Sydney"
+},
+		"period":2,
+		"high": {
+		"fahrenheit":"77",
+		"celsius":"25"
+		},
+		"low": {
+		"fahrenheit":"57",
+		"celsius":"14"
+		},
+		"conditions":"Clear",
+		"icon":"clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/clear.gif",
+		"skyicon":"",
+		"pop":10,
+		"qpf_allday": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"qpf_day": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"qpf_night": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"snow_allday": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"snow_day": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"snow_night": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"maxwind": {
+		"mph": 20,
+		"kph": 32,
+		"dir": "SSE",
+		"degrees": 154
+		},
+		"avewind": {
+		"mph": 15,
+		"kph": 24,
+		"dir": "SSE",
+		"degrees": 154
+		},
+		"avehumidity": 63,
+		"maxhumidity": 0,
+		"minhumidity": 0
+		}
+		,
+		{"date":{
+	"epoch":"1486540800",
+	"pretty":"7:00 PM AEDT on February 08, 2017",
+	"day":8,
+	"month":2,
+	"year":2017,
+	"yday":38,
+	"hour":19,
+	"min":"00",
+	"sec":0,
+	"isdst":"1",
+	"monthname":"February",
+	"monthname_short":"Feb",
+	"weekday_short":"Wed",
+	"weekday":"Wednesday",
+	"ampm":"PM",
+	"tz_short":"AEDT",
+	"tz_long":"Australia/Sydney"
+},
+		"period":3,
+		"high": {
+		"fahrenheit":"87",
+		"celsius":"31"
+		},
+		"low": {
+		"fahrenheit":"66",
+		"celsius":"19"
+		},
+		"conditions":"Clear",
+		"icon":"clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/clear.gif",
+		"skyicon":"",
+		"pop":10,
+		"qpf_allday": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"qpf_day": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"qpf_night": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"snow_allday": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"snow_day": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"snow_night": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"maxwind": {
+		"mph": 20,
+		"kph": 32,
+		"dir": "NNE",
+		"degrees": 20
+		},
+		"avewind": {
+		"mph": 15,
+		"kph": 24,
+		"dir": "NNE",
+		"degrees": 20
+		},
+		"avehumidity": 62,
+		"maxhumidity": 0,
+		"minhumidity": 0
+		}
+		,
+		{"date":{
+	"epoch":"1486627200",
+	"pretty":"7:00 PM AEDT on February 09, 2017",
+	"day":9,
+	"month":2,
+	"year":2017,
+	"yday":39,
+	"hour":19,
+	"min":"00",
+	"sec":0,
+	"isdst":"1",
+	"monthname":"February",
+	"monthname_short":"Feb",
+	"weekday_short":"Thu",
+	"weekday":"Thursday",
+	"ampm":"PM",
+	"tz_short":"AEDT",
+	"tz_long":"Australia/Sydney"
+},
+		"period":4,
+		"high": {
+		"fahrenheit":"94",
+		"celsius":"34"
+		},
+		"low": {
+		"fahrenheit":"64",
+		"celsius":"18"
+		},
+		"conditions":"Clear",
+		"icon":"clear",
+		"icon_url":"http://icons.wxug.com/i/c/k/clear.gif",
+		"skyicon":"",
+		"pop":0,
+		"qpf_allday": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"qpf_day": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"qpf_night": {
+		"in": 0.00,
+		"mm": 0
+		},
+		"snow_allday": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"snow_day": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"snow_night": {
+		"in": 0.0,
+		"cm": 0.0
+		},
+		"maxwind": {
+		"mph": 20,
+		"kph": 32,
+		"dir": "N",
+		"degrees": 353
+		},
+		"avewind": {
+		"mph": 15,
+		"kph": 24,
+		"dir": "N",
+		"degrees": 353
+		},
+		"avehumidity": 57,
+		"maxhumidity": 0,
+		"minhumidity": 0
+		}
+		]
+		}
+	}
+}
