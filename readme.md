@@ -1,8 +1,8 @@
-# SRPinkler
+# Crying Robot: A Sprinkler System for Rasbperry Pi
 
 ## Overview
 
-SRPinkler is an easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
+Crying Robot is an easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
 
 Based off the dual-premise that it is better for plants for them to be watered early in the morning and that most people don't like to wake up at 4am to water the garden, this project walks through both the code and IRL setups required to automate your garden watering.
 
@@ -112,12 +112,11 @@ Here you can see:
 5.  Temperature/humidity sensor top right (for a [seperate project](http://tagell.com/projects/kyneton-temperature-logger/))
 6.  Holes for ethernet and USB-power to come into the green box to power and control the Raspberry Pi.
 
-
 ## Code
 
 ### Installation
 
-To get sRPinkler working you'll need to do the following on your Pi.
+To get Crying Robot working you'll need to do the following on your Pi.
 
 1. Download the Dexter Industries image from their github repository and get this onto your MicroSD card.
 2. Follow the steps to set the GrovePi+ including upgrading the firmware. This is important as I've had issues with the GrovePi+ needing a hard reset without this. You'll notice this if you see the red RST light illuminated or if the water just doesn't run.

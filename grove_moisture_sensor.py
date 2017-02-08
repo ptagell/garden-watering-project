@@ -9,3 +9,12 @@ sensor = 0
 
 # uncomment when working
 print(grovepi.analogRead(sensor))
+
+print (grovepi.analogRead(sensor))
+print (grovepi.analogRead(sensor))
+print (grovepi.analogRead(sensor))
+print (grovepi.analogRead(sensor))
+print (grovepi.analogRead(sensor))
+print (grovepi.analogRead(sensor))
+print (grovepi.analogRead(sensor))
+print (moisture_values)

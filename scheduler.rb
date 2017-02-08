@@ -10,14 +10,14 @@ require 'open-uri'
 
 # This file is responsible, along with .env, for controlling when the `water.py` script is invoked.
 # How many zones will your garden have?
-zones_to_water = ENV['ZONES_TO_WATER']
+zones_to_water = ENV['ZONES_TO_WATER'].to_i
 # What is the absolute path to this project on your Rasberry Pi
 
 # zone 1 settings
 @zone_1_friendly_name = "Back Garden"
 @zone_1_flow_rate = "20"
 @zone_1_relay = ENV['ZONE_1_RELAY']
-@zone_1_moisture_sensor_present = true
+@zone_1_moisture_sensor_present = false
 @zone_1_moisture_sensor_relay = 0
 @zone_1_full_water_rate = 1200
 @zone_1_duration = ARGV[0]
@@ -89,6 +89,7 @@ end
 def retrieve_soil_moisture_data(i)
       # note - will need to target specific zones for their moisture.
     zone_moisture_level = `python #{@path_to_project}grove_moisture_sensor.py`.to_i
+    puts Time.now.localtime.to_s+" soil mositure is currenty at "+zone_moisture_level
     if zone_moisture_level >= 200 && zone_moisture_level <= 900
       puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
     elsif zone_moisture_level >= 100 && zone_moisture_level <= 199
@@ -112,12 +113,24 @@ end
 
 # Turn on the watering system using the Python controller code for the Grove Relay.
 # Note: this code only works for one watering zone at present.
-def water_garden(relay, duration)
+def water_garden(relay, duration, i)
   puts Time.now.localtime.to_s+" Turning on watering system for "+duration.to_s+" seconds"
   # Run Watering.py script for duration specified.
   # system("python water.py #{relay} #{duration}")
-  system("python #{@path_to_project}water.py #{relay} #{duration.to_i}")
+  # system("python #{@path_to_project}water.py #{relay} #{duration.to_i}")
   puts Time.now.localtime.to_s+" Turning off watering system"
+
+  @litres_used = 0
+  @total_session_duration = 0
+  # litres_used = litres_used+ARGV[i].to_i*instance_variable_get("@zone_"+i.to_s+"_flow_rate")
+  flow_rate_sec = instance_variable_get("@zone_"+i.to_s+"_flow_rate").to_f/60
+  # puts this_session_duration.to_s+"thissessionduration"
+  @litres_used = (duration*flow_rate_sec)
+  puts @litres_used
+  # puts litres_used_this_session.to_s+"litres_used_this_session"
+  @total_session_duration = duration/60
+  puts @total_session_duration
+  notify
 end
 
 def water_by_zone(i, duration)
@@ -125,39 +138,26 @@ def water_by_zone(i, duration)
   if duration.to_i != 0
     # grove_reset
     puts Time.now.localtime.to_s+" Session start time"
-    water_garden(relay, duration)
+    water_garden(relay, duration, i)
     # grove_reset
-    puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" done"
+    puts Time.now.localtime.to_s+" "+@friendly_name+" done"
   elsif duration.to_i == 0
-    puts Time.now.localtime.to_s+" "+instance_variable_get("@zone_"+i.to_s+"_friendly_name")+" skipped as no duration specified"
+    puts Time.now.localtime.to_s+" "+@friendly_name+" skipped as no duration specified"
   end
 end
 
 # Report about watering session
-def report
-  @litres_used = 0
-  @total_session_duration = 0
-  for i in 1..@number_of_zones_to_water do
-    # litres_used = litres_used+ARGV[i].to_i*instance_variable_get("@zone_"+i.to_s+"_flow_rate")
-    duration = instance_variable_get("@zone_"+i.to_s+"_duration").to_f
-    flow_rate_sec = instance_variable_get("@zone_"+i.to_s+"_flow_rate").to_f
-    # puts this_session_duration.to_s+"thissessionduration"
-    litres_used_this_session = (duration*flow_rate_sec)
-    # puts litres_used_this_session.to_s+"litres_used_this_session"
-    @total_session_duration = @total_session_duration + duration
-    @litres_used = @litres_used.to_f + litres_used_this_session.to_f
-  end
-  @total_session_duration = @total_session_duration/60
-end
 
 def notify
-  report = Time.now.localtime.to_s+"A watering session has just finished. It lasted "+@total_session_duration.round(2).to_s+" minutes and used "+@litres_used.to_s+ " litres of water"
+  report = "<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b>"
   url = URI.parse("https://api.pushover.net/1/messages.json")
   req = Net::HTTP::Post.new(url.path)
   req.set_form_data({
     :token => ENV['PUSHOVER_APP_TOKEN'],
     :user => ENV['PUSHOVER_USER_KEY'],
     :message => report,
+    :title => "Crying Robot",
+    :html => 1,
   })
   res = Net::HTTP.new(url.host, url.port)
   res.use_ssl = true
@@ -170,16 +170,19 @@ end
 
 # ================ RUN SCRIPTS ===============
 puts "\n\n Today's weather report \n\n\n"
-retrieve_weather_data
+# retrieve_weather_data
+
+puts @number_of_zones_to_water
+
 if @auto_water == true
   puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
   for i in 1..@number_of_zones_to_water do
 
     target_zone_has_sensor = instance_variable_get("@zone_"+i.to_s+"_moisture_sensor_present")
-    friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
-    puts "\n\n Beginning "+friendly_name+"\n\n\n"
+    @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
+    puts "\n\n Beginning "+@friendly_name+"\n\n\n"
     if target_zone_has_sensor == true
-      puts Time.now.localtime.to_s+" "+friendly_name+" has a moisture sensor"
+      puts Time.now.localtime.to_s+" "+@friendly_name+" has a moisture sensor"
       retrieve_soil_moisture_data(i)
     else
       puts Time.now.localtime.to_s+" Target zone does not have a moisture sensor."
@@ -191,13 +194,11 @@ if @auto_water == true
 else
   # water based off parameters instead of autowater
   for i in 1..@number_of_zones_to_water do
-    friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
-    puts "\n\n Beginning "+friendly_name+"\n\n\n"
+    @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
+    puts "\n\n Beginning "+@friendly_name+"\n\n\n"
     duration = instance_variable_get("@zone_"+i.to_s+"_duration")
     water_by_zone(i, duration)
   end
 end
 
 puts "\n\n Running Reports \n\n\n"
-report
-notify
