@@ -1,5 +1,7 @@
 # Crying Robot: A Sprinkler System for Rasbperry Pi
 
+![Crying Robot](files/crying_robot.png)
+
 ## Overview
 
 Crying Robot is an easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
