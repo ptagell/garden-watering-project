@@ -19,7 +19,7 @@ zones_to_water = ENV['ZONES_TO_WATER'].to_i
 @zone_1_relay = ENV['ZONE_1_RELAY']
 @zone_1_moisture_sensor_present = ENV['ZONE_1_MOISTURE_SENSOR_PRESENT']
 @zone_1_moisture_sensor_relay = ENV['ZONE_1_MOISTURE_SENSOR_RELAY']
-@zone_1_full_water_rate = ENV['ZONE_1_FULL_WATER_RATE']
+@zone_1_full_water_rate = ENV['ZONE_1_FULL_WATER_RATE'].to_f
 @zone_1_duration = ARGV[0]
 
 # zone 2 settings
@@ -28,7 +28,7 @@ zones_to_water = ENV['ZONES_TO_WATER'].to_i
 @zone_2_relay = ENV['ZONE_2_RELAY']
 @zone_2_moisture_sensor_present = ENV['ZONE_2_MOISTURE_SENSOR_PRESENT']
 @zone_2_moisture_sensor_relay = ENV['ZONE_2_MOISTURE_SENSOR_RELAY']
-@zone_2_full_water_rate = ENV['ZONE_2_FULL_WATER_RATE']
+@zone_2_full_water_rate = ENV['ZONE_2_FULL_WATER_RATE'].to_f
 @zone_2_duration = ARGV[1]
 
 # zone 3 settings
