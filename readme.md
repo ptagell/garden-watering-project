@@ -138,6 +138,7 @@ Your `.env` file has environment specific variables. In particular the number of
 
 1. At the top of the `.env` are the variables you _need_ to configure (notification variables are optional). To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
 ```
+PATH_TO_PROJECT=/Users/paultagell/Sites/garden-watering-project/
 ZONES_TO_WATER=2
 
 ZONE_1_FRIENDLY_NAME="Back Garden"

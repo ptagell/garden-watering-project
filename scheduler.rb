@@ -123,7 +123,7 @@ def water_garden(relay, duration, i)
   # puts this_session_duration.to_s+"thissessionduration"
   @litres_used = (duration*flow_rate_sec)
   # puts litres_used_this_session.to_s+"litres_used_this_session"
-  @total_session_duration = duration/60
+  @total_session_duration = duration.to_i/60
   notify
 end
 
