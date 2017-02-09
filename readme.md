@@ -130,18 +130,28 @@ To get Crying Robot working you'll need to do the following on your Pi.
 8. Run `rvm cron setup` to enable your crontab to access the version of ruby and gemset you've created. Thanks [Daniel Schmidt](https://coderwall.com/p/vhv8aw/getting-ruby-scripts-working-with-bundler-rvm-and-cron)
 
 ### Configuring your electronics and zones
-1. Once you've got your Ruby environment set up, it's time to configure your Grove Relays to trigger at the right times. To do this, open the file `scheduler.rb`.
-2. At the top of the files are the variables you need to configure. To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
+1. Once you've got your Ruby environment set up, it's time to configure your Grove Relays to trigger at the right times. To do this you'll need to modify two files `.env` and `scheduler.rb`. To set up your `.env` files, rename the file called `.env.sample` in the root of your directory (eg. for me `~/Projects/garden-watering-project/.env`).
+
+#### `.env`
+Your `.env` file has environment specific variables. In particular the number of zones you're looking to water and the ports used on your GrovePi+ to connect your relays.
+
+1. At the top of the `.env` are the variables you need to configure. To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
 ```
-@zone_1_relay = 5
-@zone_2_relay = 4
-@zone_3_relay = 3
+ZONES_TO_WATER=2
+ZONE_1_RELAY=4
+ZONE_2_RELAY=5
 ```
-3. This is also where you can customise the names of your zones by modifying the entries for `@zone_n_friendly_name`. Make sure your friendly name is surrounded by the `"` character.
-4. For reporting purposes, you can also set up a flow rate here by modifying the `@zone_n_flow_rate` entries. This number is in **litres per minute**. The easiest way to get this is to make sure no other water is being used in your house and do a test water of the zone you're looking to get the flow rate for. I recommend using your smartphone to take a video for around 30 seconds while you wait for at least a litre of water to flow through the meter. Depending on your watering system this will take a long time (drippers) or a short time (sprinklers). To calculate `flow_rate`:
+If you need additional zones, simply add additional lines incrementing by 1 each time. eg. `ZONE_3_RELAY=3`. Make sure you also increment the zones to water.
+
+#### `scheduler.rb`
+Scheduler.rb has a whole load of information for each zone.
+
+1. Rename `@zone_n_friendly_name` to specify a friendly name for each zone. Make sure your friendly name is surrounded by the `"` character.
+2. For reporting purposes, you can also set up a flow rate here by modifying the `@zone_n_flow_rate` entries. This number is in **litres per minute**. The easiest way to get this is to make sure no other water is being used in your house and do a test water of the zone you're looking to get the flow rate for. I recommend using your smartphone to take a video for around 30 seconds while you wait for at least a litre of water to flow through the meter. Depending on your watering system this will take a long time (drippers) or a short time (sprinklers). To calculate `flow_rate`:
 * look at how many seconds it took to use a litre of water.
 * Divide by the number of seconds it took and multiply by 60. eg. if it takes 43 seconds to use a litre of water.
 `1 / 43 * 60 = 1.39 litres per minute`
+3. Set `zone_1_moisture_sensor_present` to either true or false, depending on whether you have a moisture sensor or not.
 
 ### Notifications
 
@@ -152,7 +162,7 @@ To setup notifications:
 1. Go to `Pushover` and signup for an account.
 2. Obtain your `PUSHOVER USER KEY`
 3. Create a new application and get it's `PUSHOVER APP TOKEN`.
-4. Rename the file called `.env.sample` in the root of your directory (eg. for me `~/Projects/garden-watering-project/.env`) and add these two entries to the file in format you find there:
+4. Rename the file called `.env.sample` in the root of your directory if you haven't already done so (eg. for me `~/Projects/garden-watering-project/.env`) and add these two entries to the file in format you find there:
 
 example .env file
 ```
