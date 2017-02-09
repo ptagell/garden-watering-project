@@ -121,7 +121,8 @@ def water_garden(relay, duration, i)
   # litres_used = litres_used+ARGV[i].to_i*instance_variable_get("@zone_"+i.to_s+"_flow_rate")
   flow_rate_sec = instance_variable_get("@zone_"+i.to_s+"_flow_rate").to_f/60
   # puts this_session_duration.to_s+"thissessionduration"
-  @litres_used = (duration*flow_rate_sec)
+  puts @duration
+  puts @litres_used
   # puts litres_used_this_session.to_s+"litres_used_this_session"
   @total_session_duration = duration.to_i/60
   notify
@@ -129,9 +130,11 @@ end
 
 def water_by_zone(i, duration)
   relay = instance_variable_get("@zone_"+i.to_s+"_relay")
+  puts duration
   if duration.to_i != 0
     # grove_reset
     puts Time.now.localtime.to_s+" Session start time"
+    puts duration
     water_garden(relay, duration, i)
     # grove_reset
     puts Time.now.localtime.to_s+" "+@friendly_name+" done"
@@ -189,6 +192,7 @@ else
     @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
     puts "\n\n Beginning "+@friendly_name+"\n\n\n"
     duration = instance_variable_get("@zone_"+i.to_s+"_duration")
+    puts duration
     water_by_zone(i, duration)
   end
 end
