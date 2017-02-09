@@ -129,25 +129,35 @@ To get Crying Robot working you'll need to do the following on your Pi.
 7. Run `gem install bundler` followed by `bundle install` to install the required gems into the gemset you've created.
 8. Run `rvm cron setup` to enable your crontab to access the version of ruby and gemset you've created. Thanks [Daniel Schmidt](https://coderwall.com/p/vhv8aw/getting-ruby-scripts-working-with-bundler-rvm-and-cron)
 
-### Configuring your electronics and zones
-1. Once you've got your Ruby environment set up, it's time to configure your Grove Relays to trigger at the right times. To do this you'll need to modify two files `.env` and `scheduler.rb`. To set up your `.env` files, rename the file called `.env.sample` in the root of your directory (eg. for me `~/Projects/garden-watering-project/.env`).
+### Configuring your electronics and zones using the `.env` file
+Once you've got your Ruby environment set up, it's time to configure your `.env` file to understand your setup.
 
-#### `.env`
+1. To set up your `.env` file, rename the file called `.env.sample` in the root of your directory (eg. for me `~/Projects/garden-watering-project/.env`).
+
 Your `.env` file has environment specific variables. In particular the number of zones you're looking to water and the ports used on your GrovePi+ to connect your relays.
 
-1. At the top of the `.env` are the variables you need to configure. To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
+1. At the top of the `.env` are the variables you _need_ to configure (notification variables are optional). To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
 ```
 ZONES_TO_WATER=2
+
+ZONE_1_FRIENDLY_NAME="Back Garden"
+ZONE_1_FLOW_RATE="20"
 ZONE_1_RELAY=4
+ZONE_1_MOISTURE_SENSOR_PRESENT=true
+ZONE_1_MOISTURE_SENSOR_RELAY=0
+ZONE_1_FULL_WATER_RATE=1200
+
+ZONE_2_FRIENDLY_NAME="Front Garden"
+ZONE_2_FLOW_RATE="1.25"
 ZONE_2_RELAY=5
+ZONE_2_MOISTURE_SENSOR_PRESENT=false
+ZONE_2_MOISTURE_SENSOR_RELAY=1
+ZONE_2_FULL_WATER_RATE=4800
 ```
+
 If you need additional zones, simply add additional lines incrementing by 1 each time. eg. `ZONE_3_RELAY=3`. Make sure you also increment the zones to water.
 
-#### `scheduler.rb`
-Scheduler.rb has a whole load of information for each zone.
-
-1. Rename `@zone_n_friendly_name` to specify a friendly name for each zone. Make sure your friendly name is surrounded by the `"` character.
-2. For reporting purposes, you can also set up a flow rate here by modifying the `@zone_n_flow_rate` entries. This number is in **litres per minute**. The easiest way to get this is to make sure no other water is being used in your house and do a test water of the zone you're looking to get the flow rate for. I recommend using your smartphone to take a video for around 30 seconds while you wait for at least a litre of water to flow through the meter. Depending on your watering system this will take a long time (drippers) or a short time (sprinklers). To calculate `flow_rate`:
+2. For reporting purposes, you can set up a flow rate here by modifying the `@zone_n_flow_rate` entries. This number is in **litres per minute**. The easiest way to get this is to make sure no other water is being used in your house and do a test water of the zone you're looking to get the flow rate for. I recommend using your smartphone to take a video for around 30 seconds while you wait for at least a litre of water to flow through the meter. Depending on your watering system this will take a long time (drippers) or a short time (sprinklers). To calculate `flow_rate`:
 * look at how many seconds it took to use a litre of water.
 * Divide by the number of seconds it took and multiply by 60. eg. if it takes 43 seconds to use a litre of water.
 `1 / 43 * 60 = 1.39 litres per minute`
@@ -170,8 +180,6 @@ PUSHOVER_APP_TOKEN=apptokengoeshere
 PUSHOVER_USER_KEY=userkeygoeshere
 ```
 5. Install the Pushover app on the devices you'd like the notified on (eg. the Pusover iOS application) and sign in using your account credentials.
-
-
 
 #### Test notifications
 Test notifications by opening your terminal and running:

@@ -14,29 +14,25 @@ zones_to_water = ENV['ZONES_TO_WATER'].to_i
 # What is the absolute path to this project on your Rasberry Pi
 
 # zone 1 settings
-@zone_1_friendly_name = "Back Garden"
-@zone_1_flow_rate = "20"
+@zone_1_friendly_name = ENV['ZONE_1_FRIENDLY_NAME']
+@zone_1_flow_rate = ENV['ZONE_1_FLOW_RATE']
 @zone_1_relay = ENV['ZONE_1_RELAY']
-@zone_1_moisture_sensor_present = false
-@zone_1_moisture_sensor_relay = 0
-@zone_1_full_water_rate = 1200
+@zone_1_moisture_sensor_present = ENV['ZONE_1_MOISTURE_SENSOR_PRESENT']
+@zone_1_moisture_sensor_relay = ENV['ZONE_1_MOISTURE_SENSOR_RELAY']
+@zone_1_full_water_rate = ENV['ZONE_1_FULL_WATER_RATE']
 @zone_1_duration = ARGV[0]
 
 # zone 2 settings
-@zone_2_friendly_name = "Front Garden"
-@zone_2_flow_rate = "1.25"
+@zone_2_friendly_name = ENV['ZONE_2_FRIENDLY_NAME']
+@zone_2_flow_rate = ENV['ZONE_2_FLOW_RATE']
 @zone_2_relay = ENV['ZONE_2_RELAY']
-@zone_2_moisture_sensor_present = false
-@zone_2_full_water_rate = 7200
+@zone_2_moisture_sensor_present = ENV['ZONE_2_MOISTURE_SENSOR_PRESENT']
+@zone_2_moisture_sensor_relay = ENV['ZONE_2_MOISTURE_SENSOR_RELAY']
+@zone_2_full_water_rate = ENV['ZONE_2_FULL_WATER_RATE']
 @zone_2_duration = ARGV[1]
 
 # zone 3 settings
-@zone_3_friendly_name = "Wicking Beds"
-@zone_3_flow_rate = "20"
-@zone_3_relay = 3
-@zone_3_moisture_sensor_present = false
-@zone_3_full_water_rate = 0
-@zone_3_duration = ARGV[2]
+# ... duplicate the settings above here and in the .env file to add a third (or more) zone...
 
 @session_start_time = Time.now.localtime
 @weather_modifier = 1.0 #default weather modifier value
@@ -126,10 +122,8 @@ def water_garden(relay, duration, i)
   flow_rate_sec = instance_variable_get("@zone_"+i.to_s+"_flow_rate").to_f/60
   # puts this_session_duration.to_s+"thissessionduration"
   @litres_used = (duration*flow_rate_sec)
-  puts @litres_used
   # puts litres_used_this_session.to_s+"litres_used_this_session"
   @total_session_duration = duration/60
-  puts @total_session_duration
   notify
 end
 
@@ -171,8 +165,6 @@ end
 # ================ RUN SCRIPTS ===============
 puts "\n\n Today's weather report \n\n\n"
 # retrieve_weather_data
-
-puts @number_of_zones_to_water
 
 if @auto_water == true
   puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
