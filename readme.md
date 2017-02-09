@@ -1,8 +1,10 @@
-# SRPinkler
+# Crying Robot: A Sprinkler System for Rasbperry Pi
+
+![Crying Robot](files/crying_robot.png)
 
 ## Overview
 
-SRPinkler is an easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
+Crying Robot is an easy to use and setup garden watering automation system by Raspberry Pi, GrovePi+ featuring multi-zone watering support, timers and iOS notifications and easy set up instructions for novice Raspberry Pi users (like me).
 
 Based off the dual-premise that it is better for plants for them to be watered early in the morning and that most people don't like to wake up at 4am to water the garden, this project walks through both the code and IRL setups required to automate your garden watering.
 
@@ -112,12 +114,11 @@ Here you can see:
 5.  Temperature/humidity sensor top right (for a [seperate project](http://tagell.com/projects/kyneton-temperature-logger/))
 6.  Holes for ethernet and USB-power to come into the green box to power and control the Raspberry Pi.
 
-
 ## Code
 
 ### Installation
 
-To get sRPinkler working you'll need to do the following on your Pi.
+To get Crying Robot working you'll need to do the following on your Pi.
 
 1. Download the Dexter Industries image from their github repository and get this onto your MicroSD card.
 2. Follow the steps to set the GrovePi+ including upgrading the firmware. This is important as I've had issues with the GrovePi+ needing a hard reset without this. You'll notice this if you see the red RST light illuminated or if the water just doesn't run.
@@ -128,19 +129,39 @@ To get sRPinkler working you'll need to do the following on your Pi.
 7. Run `gem install bundler` followed by `bundle install` to install the required gems into the gemset you've created.
 8. Run `rvm cron setup` to enable your crontab to access the version of ruby and gemset you've created. Thanks [Daniel Schmidt](https://coderwall.com/p/vhv8aw/getting-ruby-scripts-working-with-bundler-rvm-and-cron)
 
-### Configuring your electronics and zones
-1. Once you've got your Ruby environment set up, it's time to configure your Grove Relays to trigger at the right times. To do this, open the file `scheduler.rb`.
-2. At the top of the files are the variables you need to configure. To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
+### Configuring your electronics and zones using the `.env` file
+Once you've got your Ruby environment set up, it's time to configure your `.env` file to understand your setup.
+
+1. To set up your `.env` file, rename the file called `.env.sample` in the root of your directory (eg. for me `~/Projects/garden-watering-project/.env`).
+
+Your `.env` file has environment specific variables. In particular the number of zones you're looking to water and the ports used on your GrovePi+ to connect your relays.
+
+1. At the top of the `.env` are the variables you _need_ to configure (notification variables are optional). To make the relays work you'll need to make sure that the relay number specified for each zone matches the digital port you've plugged into on your GrovePi+. For simplicity I use 5, 4 and 3 as this has them sitting next to each other (Hello OCD...nice to see you here):
 ```
-@zone_1_relay = 5
-@zone_2_relay = 4
-@zone_3_relay = 3
+ZONES_TO_WATER=2
+
+ZONE_1_FRIENDLY_NAME="Back Garden"
+ZONE_1_FLOW_RATE="20"
+ZONE_1_RELAY=4
+ZONE_1_MOISTURE_SENSOR_PRESENT=true
+ZONE_1_MOISTURE_SENSOR_RELAY=0
+ZONE_1_FULL_WATER_RATE=1200
+
+ZONE_2_FRIENDLY_NAME="Front Garden"
+ZONE_2_FLOW_RATE="1.25"
+ZONE_2_RELAY=5
+ZONE_2_MOISTURE_SENSOR_PRESENT=false
+ZONE_2_MOISTURE_SENSOR_RELAY=1
+ZONE_2_FULL_WATER_RATE=4800
 ```
-3. This is also where you can customise the names of your zones by modifying the entries for `@zone_n_friendly_name`. Make sure your friendly name is surrounded by the `"` character.
-4. For reporting purposes, you can also set up a flow rate here by modifying the `@zone_n_flow_rate` entries. This number is in **litres per minute**. The easiest way to get this is to make sure no other water is being used in your house and do a test water of the zone you're looking to get the flow rate for. I recommend using your smartphone to take a video for around 30 seconds while you wait for at least a litre of water to flow through the meter. Depending on your watering system this will take a long time (drippers) or a short time (sprinklers). To calculate `flow_rate`:
+
+If you need additional zones, simply add additional lines incrementing by 1 each time. eg. `ZONE_3_RELAY=3`. Make sure you also increment the zones to water.
+
+2. For reporting purposes, you can set up a flow rate here by modifying the `@zone_n_flow_rate` entries. This number is in **litres per minute**. The easiest way to get this is to make sure no other water is being used in your house and do a test water of the zone you're looking to get the flow rate for. I recommend using your smartphone to take a video for around 30 seconds while you wait for at least a litre of water to flow through the meter. Depending on your watering system this will take a long time (drippers) or a short time (sprinklers). To calculate `flow_rate`:
 * look at how many seconds it took to use a litre of water.
 * Divide by the number of seconds it took and multiply by 60. eg. if it takes 43 seconds to use a litre of water.
 `1 / 43 * 60 = 1.39 litres per minute`
+3. Set `zone_1_moisture_sensor_present` to either true or false, depending on whether you have a moisture sensor or not.
 
 ### Notifications
 
@@ -151,7 +172,7 @@ To setup notifications:
 1. Go to `Pushover` and signup for an account.
 2. Obtain your `PUSHOVER USER KEY`
 3. Create a new application and get it's `PUSHOVER APP TOKEN`.
-4. Rename the file called `.env.sample` in the root of your directory (eg. for me `~/Projects/garden-watering-project/.env`) and add these two entries to the file in format you find there:
+4. Rename the file called `.env.sample` in the root of your directory if you haven't already done so (eg. for me `~/Projects/garden-watering-project/.env`) and add these two entries to the file in format you find there:
 
 example .env file
 ```
@@ -159,8 +180,6 @@ PUSHOVER_APP_TOKEN=apptokengoeshere
 PUSHOVER_USER_KEY=userkeygoeshere
 ```
 5. Install the Pushover app on the devices you'd like the notified on (eg. the Pusover iOS application) and sign in using your account credentials.
-
-
 
 #### Test notifications
 Test notifications by opening your terminal and running:
