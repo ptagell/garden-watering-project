@@ -129,7 +129,7 @@ def water_garden(relay, duration, i)
 end
 
 def water_by_zone(i, duration)
-  relay = instance_variable_get("@zone_"+i.to_s+"_relay"
+  relay = instance_variable_get("@zone_"+i.to_s+"_relay")
   if duration.to_i != 0
     # grove_reset
     puts Time.now.localtime.to_s+" Session start time"
