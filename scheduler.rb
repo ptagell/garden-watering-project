@@ -113,7 +113,7 @@ def water_garden(relay, duration, i)
   puts Time.now.localtime.to_s+" Turning on watering system for "+duration.to_s+" seconds"
   # Run Watering.py script for duration specified.
   # system("python water.py #{relay} #{duration}")
-  # system("python #{@path_to_project}water.py #{relay} #{duration.to_i}")
+  system("python #{@path_to_project}water.py #{relay} #{duration.to_i}")
   puts Time.now.localtime.to_s+" Turning off watering system"
 
   @litres_used = 0
