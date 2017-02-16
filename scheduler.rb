@@ -125,7 +125,9 @@ def water_garden(relay, duration, i)
   # puts litres_used_this_session.to_s+"litres_used_this_session"
   @total_session_duration = duration.to_i/60
   @litres_used = (duration.to_f*flow_rate_sec.to_f).round(2)
+  puts "Starting notify"
   notify
+  puts "finished notify"
 end
 
 def water_by_zone(i, duration)
@@ -158,6 +160,7 @@ def notify
   res.use_ssl = true
   res.verify_mode = OpenSSL::SSL::VERIFY_PEER
   res.start {|http| http.request(req) }
+  puts "Got here"
   if ENV['PUSHOVER_APP_TOKEN'] != nil
     puts Time.now.localtime.to_s+" notified iOS application successfully"
   end
@@ -172,7 +175,7 @@ if @auto_water == true
   for i in 1..@number_of_zones_to_water do
 
     target_zone_has_sensor = instance_variable_get("@zone_"+i.to_s+"_moisture_sensor_present")
-    @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
+    @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name").to_s
     puts "\n\n Beginning "+@friendly_name+"\n\n\n"
     if target_zone_has_sensor == true
       puts Time.now.localtime.to_s+" "+@friendly_name+" has a moisture sensor"
@@ -187,7 +190,7 @@ if @auto_water == true
 else
   # water based off parameters instead of autowater
   for i in 1..@number_of_zones_to_water do
-    @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name")
+    @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name").to_s
     puts "\n\n Beginning "+@friendly_name+"\n\n\n"
     duration = instance_variable_get("@zone_"+i.to_s+"_duration")
     water_by_zone(i, duration)
