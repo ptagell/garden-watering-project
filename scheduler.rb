@@ -113,6 +113,7 @@ def water_garden(relay, duration, i)
   puts Time.now.localtime.to_s+" Turning on watering system for "+duration.to_s+" seconds"
   # Run Watering.py script for duration specified.
   # system("python water.py #{relay} #{duration}")
+  puts @path_to_project
   system("python #{@path_to_project}water.py #{relay} #{duration.to_i}")
   puts Time.now.localtime.to_s+" Turning off watering system"
 
@@ -168,7 +169,7 @@ end
 
 # ================ RUN SCRIPTS ===============
 puts "\n\n Today's weather report \n\n\n"
-# retrieve_weather_data
+retrieve_weather_data
 
 if @auto_water == true
   puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
