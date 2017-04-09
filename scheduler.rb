@@ -72,34 +72,39 @@ def retrieve_weather_data
   yesterday_rainfall = @history_parsed_json['history']['dailysummary'][0]['precipm'].to_i
 
   if yesterday_rainfall >= 5
+    @weather_modifier = 0
     report = Time.now.localtime.to_s+" There was "+yesterday_rainfall.to_s+"mm of rain yesterday, so not watering today"
     puts report
     messenger(report)
-    @weather_modifier = 0
+
   else
     if chance_of_rain <= 79
       if amount_of_rain >= 10
+        @weather_modifier = 0.75
         report = Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, but if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-        @weather_modifier = 0.75
+
       else
+        @weather_modifier = 1.0
         report = Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, and even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-        @weather_modifier = 1.0
+
       end
     else
       if amount_of_rain >= 10
+        @weather_modifier = 0
         report = Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, and if it does rain, it's predicted to rain around "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-        @weather_modifier = 0
+
       else
+        @weather_modifier = 0.5
         report = Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, but even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-        @weather_modifier = 0.5
+
       end
     end
   end
@@ -191,7 +196,7 @@ def messenger(report)
 end
 
 def notify
-  report = "<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b>"
+  report = "<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b> Weather modified was "+@weather_modifier.to_s
   messenger(report)
 end
 
@@ -199,7 +204,6 @@ end
 # ================ RUN SCRIPTS ===============
 puts "\n\n Today's weather report \n\n\n"
 retrieve_weather_data
-
 if @auto_water == true
   puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
   for i in 1..@number_of_zones_to_water do
