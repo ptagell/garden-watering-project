@@ -71,7 +71,7 @@ def retrieve_weather_data
   amount_of_rain = @parsed_json['forecast']['simpleforecast']['forecastday'][0]['qpf_allday']['mm'].to_i
   yesterday_rainfall = @history_parsed_json['history']['dailysummary'][0]['precipm'].to_i
 
-  if yesterday_rainfall <= 5
+  if yesterday_rainfall >= 5
     report = Time.now.localtime.to_s+" There was "+yesterday_rainfall.to_s+"mm of rain yesterday, so not watering today"
     puts report
     messenger(report)
@@ -191,7 +191,7 @@ def messenger(report)
 end
 
 def notify
-  report = '"<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b>"'
+  report = "<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b>"
   messenger(report)
 end
 
