@@ -52,6 +52,14 @@ end
 def retrieve_weather_data
   puts Time.now.localtime.to_s+" Connecting to the weather underground to retrieve todays weather history"
   date = Date.today.strftime('%Y%m%d')
+  yesterday = (Date.today-1).strftime('%Y%m%d')
+  # Yesterday's rainfall
+  yesterday_url = "http://api.wunderground.com/api/#{ENV['WEATHER_UNDERGROUND_KEY']}/history_"+yesterday.to_s+"/geolookup/q/pws:IVICKYNE2.json"
+  open(yesterday_url) do |f|
+    json_string = f.read
+    @history_parsed_json = JSON.parse(json_string)
+  end
+  # Today's forecast
   url = "http://api.wunderground.com/api/#{ENV['WEATHER_UNDERGROUND_KEY']}/forecast"+"/geolookup/q/pws:IVICKYNE2.json"
   open(url) do |f|
     json_string = f.read
@@ -61,26 +69,42 @@ def retrieve_weather_data
   puts Time.now.localtime.to_s+" Extracting relevant data from forecast"
   chance_of_rain = @parsed_json['forecast']['simpleforecast']['forecastday'][0]['pop'].to_i
   amount_of_rain = @parsed_json['forecast']['simpleforecast']['forecastday'][0]['qpf_allday']['mm'].to_i
-  if chance_of_rain <= 80
-    if amount_of_rain >= 10
-      puts Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, but if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
-      @weather_modifier = 0.75
-    else
-      puts Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, and even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
-      @weather_modifier = 1.0
-    end
+  yesterday_rainfall = @history_parsed_json['history']['dailysummary'][0]['precipm'].to_i
+
+  if yesterday_rainfall <= 5
+    report = Time.now.localtime.to_s+" There was "+yesterday_rainfall.to_s+"mm of rain yesterday, so not watering today"
+    puts report
+    messenger(report)
+    @weather_modifier = 0
   else
-    if amount_of_rain >= 10
-      puts Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, and if it does rain, it's predicted to rain around "+amount_of_rain.to_s+"mm"
-      @weather_modifier = 0
+    if chance_of_rain <= 79
+      if amount_of_rain >= 10
+        report = Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, but if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
+        puts report
+        messenger(report)
+        @weather_modifier = 0.75
+      else
+        report = Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, and even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
+        puts report
+        messenger(report)
+        @weather_modifier = 1.0
+      end
     else
-      puts Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, but even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
-      @weather_modifier = 0.5
+      if amount_of_rain >= 10
+        report = Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, and if it does rain, it's predicted to rain around "+amount_of_rain.to_s+"mm"
+        puts report
+        messenger(report)
+        @weather_modifier = 0
+      else
+        report = Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, but even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
+        puts report
+        messenger(report)
+        @weather_modifier = 0.5
+      end
     end
   end
   puts Time.now.localtime.to_s+" Setting weather modifier to "+@weather_modifier.to_s
 end
-
 
 def retrieve_soil_moisture_data(i)
       # note - will need to target specific zones for their moisture.
@@ -146,8 +170,7 @@ end
 
 # Report about watering session
 
-def notify
-  report = "<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b>"
+def messenger(report)
   url = URI.parse("https://api.pushover.net/1/messages.json")
   req = Net::HTTP::Post.new(url.path)
   req.set_form_data({
@@ -161,11 +184,17 @@ def notify
   res.use_ssl = true
   res.verify_mode = OpenSSL::SSL::VERIFY_PEER
   res.start {|http| http.request(req) }
-  puts "Got here"
+
   if ENV['PUSHOVER_APP_TOKEN'] != nil
     puts Time.now.localtime.to_s+" notified iOS application successfully"
   end
 end
+
+def notify
+  report = '"<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b>"'
+  messenger(report)
+end
+
 
 # ================ RUN SCRIPTS ===============
 puts "\n\n Today's weather report \n\n\n"
@@ -174,7 +203,6 @@ retrieve_weather_data
 if @auto_water == true
   puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
   for i in 1..@number_of_zones_to_water do
-
     target_zone_has_sensor = instance_variable_get("@zone_"+i.to_s+"_moisture_sensor_present")
     @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name").to_s
     puts "\n\n Beginning "+@friendly_name+"\n\n\n"
