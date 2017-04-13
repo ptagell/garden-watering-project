@@ -218,9 +218,9 @@ end
 
 def sleep_for_remainder_of_hour
   current_time = Time.now
-  remainder_of_hour = 59-Time.now.min
+  remainder_of_hour = (59-Time.now.min)*60
   system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{remainder_of_hour}?access_token=#{ENV['WIO_TOKEN']}")
-  puts Time.now.localtime.to_s+" Have put system to sleep for the "+remainder_of_hour.to_s+"mins remaining in the hour"
+  puts Time.now.localtime.to_s+" Have put system to sleep for the "+remainder_of_hour.to_s+"seconds remaining in the hour"
 end
 
 # ================ RUN SCRIPTS ===============
