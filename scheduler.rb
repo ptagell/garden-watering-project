@@ -52,6 +52,7 @@ end
 def retrieve_weather_data
   puts Time.now.localtime.to_s+" Connecting to the weather underground to retrieve todays weather history"
   date = Date.today.strftime('%Y%m%d')
+
   yesterday = (Date.today-1).strftime('%Y%m%d')
   # Yesterday's rainfall
   yesterday_url = "http://api.wunderground.com/api/#{ENV['WEATHER_UNDERGROUND_KEY']}/history_"+yesterday.to_s+"/geolookup/q/pws:IVICKYNE2.json"
@@ -59,6 +60,8 @@ def retrieve_weather_data
     json_string = f.read
     @history_parsed_json = JSON.parse(json_string)
   end
+
+
   # Today's forecast
   url = "http://api.wunderground.com/api/#{ENV['WEATHER_UNDERGROUND_KEY']}/forecast"+"/geolookup/q/pws:IVICKYNE2.json"
   open(url) do |f|
@@ -112,20 +115,29 @@ def retrieve_weather_data
 end
 
 def retrieve_soil_moisture_data(i)
-      # note - will need to target specific zones for their moisture.
-    zone_moisture_level = `python #{@path_to_project}grove_moisture_sensor.py`.to_i
-    puts Time.now.localtime.to_s+" soil mositure is currenty at "+zone_moisture_level
-    if zone_moisture_level >= 200 && zone_moisture_level <= 900
-      puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
-    elsif zone_moisture_level >= 100 && zone_moisture_level <= 199
-      puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
-      duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
-      water_by_zone(i, duration)
-    elsif zone_moisture_level >=0 && zone_moisture_level <= 99
-      puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
-      duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
-      water_by_zone(i, duration)
-    end
+
+  sensor_url = "https://us.wio.seeed.io/v1/node/GroveMoistureA0/moisture?access_token=#{ENV['WIO_TOKEN']}"
+  open(sensor_url) do |f|
+    json_string = f.read
+    @moisture_data = JSON.parse(json_string)
+  end
+
+  # Put Wio node sensor to sleep for
+
+  zone_moisture_level = @moisture_data['moisture'].to_i
+  # note - will need to target specific zones for their moisture.
+  puts Time.now.localtime.to_s+" soil moisture is currently at "+zone_moisture_level.to_s
+  if zone_moisture_level >= 200 && zone_moisture_level <= 900
+    puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
+  elsif zone_moisture_level >= 100 && zone_moisture_level <= 199
+    puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
+    duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
+    water_by_zone(i, duration)
+  elsif zone_moisture_level >=0 && zone_moisture_level <= 99
+    puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
+    duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
+    water_by_zone(i, duration)
+  end
 end
 
 # I stumbled across an issue whereby the GrovePi would need resetting (RST light woudl activate). This line resets the GrovePi before trying to run any commands with it. Important to do it before each watering session to increase the chances it doesn't fail during the watering session (and keep watering...watering...watering)
@@ -155,9 +167,7 @@ def water_garden(relay, duration, i)
   # puts litres_used_this_session.to_s+"litres_used_this_session"
   @total_session_duration = duration.to_i/60
   @litres_used = (duration.to_f*flow_rate_sec.to_f).round(2)
-  puts "Starting notify"
   notify
-  puts "finished notify"
 end
 
 def water_by_zone(i, duration)
@@ -196,7 +206,7 @@ def messenger(report)
 end
 
 def notify
-  report = "<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b> Weather modified was "+@weather_modifier.to_s
+  report = "<b>"+@friendly_name+" just finished watering</b>. It lasted "+@total_session_duration.round(2).to_s+" minutes and <b>used "+@litres_used.to_s+ " litres of water</b> Weather modifier was "+@weather_modifier.to_s
   messenger(report)
 end
 
@@ -210,7 +220,7 @@ if @auto_water == true
     target_zone_has_sensor = instance_variable_get("@zone_"+i.to_s+"_moisture_sensor_present")
     @friendly_name = instance_variable_get("@zone_"+i.to_s+"_friendly_name").to_s
     puts "\n\n Beginning "+@friendly_name+"\n\n\n"
-    if target_zone_has_sensor == true
+    if target_zone_has_sensor == "true"
       puts Time.now.localtime.to_s+" "+@friendly_name+" has a moisture sensor"
       retrieve_soil_moisture_data(i)
     else
