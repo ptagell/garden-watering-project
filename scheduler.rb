@@ -132,10 +132,16 @@ def retrieve_soil_moisture_data(i)
   elsif zone_moisture_level >= 100 && zone_moisture_level <= 199
     puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
     duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
+    sleep_duration = duration-10.to_i
+    system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{duration.to_i-10}?access_token=#{ENV['WIO_TOKEN']}")
+    puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
     water_by_zone(i, duration)
   elsif zone_moisture_level >=0 && zone_moisture_level <= 99
     puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
     duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
+    sleep_duration = duration-10.to_i
+    system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{duration.to_i-10}?access_token=#{ENV['WIO_TOKEN']}")
+    puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
     water_by_zone(i, duration)
   end
 end
@@ -210,6 +216,12 @@ def notify
   messenger(report)
 end
 
+def sleep_for_remainder_of_hour
+  current_time = Time.now
+  remainder_of_hour = 59-Time.now.min
+  system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{remainder_of_hour}?access_token=#{ENV['WIO_TOKEN']}")
+  puts Time.now.localtime.to_s+" Have put system to sleep for the "+remainder_of_hour.to_s+"mins remaining in the hour"
+end
 
 # ================ RUN SCRIPTS ===============
 puts "\n\n Today's weather report \n\n\n"
@@ -239,5 +251,7 @@ else
     water_by_zone(i, duration)
   end
 end
+
+sleep_for_remainder_of_hour
 
 puts "\n\n Running Reports \n\n\n"
