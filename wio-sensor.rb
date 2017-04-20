@@ -19,8 +19,3 @@ unless now.hour == target_time.hour+1
 else
   puts Time.now.localtime.to_s+" Rise and shine. Ready to water."
 end
-
-
-
-- [ ] Solve issue with target time being set to earlier in the same day
-- [ ] Solve issue with 5am wake up (and potential sleeping till next day)
