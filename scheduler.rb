@@ -115,19 +115,30 @@ def retrieve_weather_data
 end
 
 def retrieve_soil_moisture_data(i)
-  wio_token = "ZONE_"+i.to_s+"_WIO_TOKEN"
-  now = DateTime.now
-  target_time = DateTime.new(now.year, now.month, now.day, now.hour+3, 59, 50, now.zone)
-  sleep_duration = ((target_time-now)*24*60*60).to_i
 
-  sensor_url = "https://us.wio.seeed.io/v1/node/GroveMoistureA0/moisture?access_token=#{ENV[wio_token]}"
-  sleep_url = "https://us.wio.seeed.io/v1/node/pm/sleep/#{sleep_duration}?access_token=#{ENV[wio_token]}"
+  wio_token_target = "ZONE_"+i.to_s+"_WIO_TOKEN"
+  wio_token = ENV[wio_token_target]
+  puts wio_token
+  now = DateTime.now
+  puts now
+  target_time = DateTime.new(now.year, now.month, now.day, now.hour+3, 59, 50, now.zone)
+  puts target_time
+  sleep_duration = ((target_time-now)*24*60*60).to_i
+  puts sleep_duration
+
+  sensor_url = "https://us.wio.seeed.io/v1/node/GroveMoistureA0/moisture?access_token="+wio_token
+  puts sensor_url
+  sleep_url = "https://us.wio.seeed.io/v1/node/pm/sleep/"+sleep_duration.to_s+"?access_token="+wio_token
+  # puts sleep_url
+  yesterday_url =
 
   open(sensor_url) do |f|
     json_string = f.read
+    puts json_string
     @moisture_data = JSON.parse(json_string)
   end
 
+  puts "GOT HERE"
   zone_moisture_level = @moisture_data['moisture'].to_i
   # note - will need to target specific zones for their moisture.
   puts Time.now.localtime.to_s+" soil moisture is currently at "+zone_moisture_level.to_s
