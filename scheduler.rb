@@ -133,12 +133,13 @@ def retrieve_soil_moisture_data(i)
   puts Time.now.localtime.to_s+" soil moisture is currently at "+zone_moisture_level.to_s
   if zone_moisture_level >= 700 && zone_moisture_level <= 1100
     puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
-  elsif zone_moisture_level >= 400 && zone_moisture_level <= 699
-    system("curl -k -X POST #{sleep_url}")
-    puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
-    duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
     system("curl -k -X POST #{sleep_url}")
     puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
+  elsif zone_moisture_level >= 400 && zone_moisture_level <= 699
+    puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
+    system("curl -k -X POST #{sleep_url}")
+    puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
+    duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
     water_by_zone(i, duration)
   elsif zone_moisture_level >=0 && zone_moisture_level <= 399
     puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
