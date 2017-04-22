@@ -7,6 +7,7 @@ require 'date'
 require 'json'
 require 'time'
 require 'open-uri'
+require 'curb'
 
 # This file is responsible, along with .env, for controlling when the `water.py` script is invoked.
 # How many zones will your garden have?
@@ -87,13 +88,11 @@ def retrieve_weather_data
         report = Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, but if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-
       else
         @weather_modifier = 1.0
         report = Time.now.localtime.to_s+" There is only a "+chance_of_rain.to_s+"% chance of rain today, and even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-
       end
     else
       if amount_of_rain >= 10
@@ -101,13 +100,11 @@ def retrieve_weather_data
         report = Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, and if it does rain, it's predicted to rain around "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-
       else
         @weather_modifier = 0.5
         report = Time.now.localtime.to_s+" There's a "+chance_of_rain.to_s+"% chance of rain today, but even if it does rain, it's only predicted to rain "+amount_of_rain.to_s+"mm"
         puts report
         messenger(report)
-
       end
     end
   end
@@ -118,46 +115,50 @@ def retrieve_soil_moisture_data(i)
 
   wio_token_target = "ZONE_"+i.to_s+"_WIO_TOKEN"
   wio_token = ENV[wio_token_target]
-  puts wio_token
   now = DateTime.now
-  puts now
   target_time = DateTime.new(now.year, now.month, now.day, now.hour+3, 59, 50, now.zone)
-  puts target_time
   sleep_duration = ((target_time-now)*24*60*60).to_i
-  puts sleep_duration
 
   sensor_url = "https://us.wio.seeed.io/v1/node/GroveMoistureA0/moisture?access_token="+wio_token
-  puts sensor_url
   sleep_url = "https://us.wio.seeed.io/v1/node/pm/sleep/"+sleep_duration.to_s+"?access_token="+wio_token
-  # puts sleep_url
-  yesterday_url =
 
-  open(sensor_url) do |f|
-    json_string = f.read
-    puts json_string
-    @moisture_data = JSON.parse(json_string)
-  end
+  f = Curl.get(sensor_url)
+  json_string = f.body_str
+  @moisture_data = JSON.parse(json_string)
 
-  puts "GOT HERE"
+  # Put system back to sleep until close to an hour, when wio-sensor.rb will take over putting sensor to sleep.
+  system("curl -k -X POST #{sleep_url}")
   zone_moisture_level = @moisture_data['moisture'].to_i
-  # note - will need to target specific zones for their moisture.
-  puts Time.now.localtime.to_s+" soil moisture is currently at "+zone_moisture_level.to_s
-  if zone_moisture_level >= 700 && zone_moisture_level <= 1100
-    puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
-    system("curl -k -X POST #{sleep_url}")
-    puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
-  elsif zone_moisture_level >= 400 && zone_moisture_level <= 699
-    puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
-    system("curl -k -X POST #{sleep_url}")
-    puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
-    duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
+  zone_error_message = @moisture_data['error']
+
+  # Zone moisture level of 0 is the integer returned when nil.
+  if zone_moisture_level == 0
+    report = Time.now.localtime.to_s+" Battery is dead or sensor is not responding"
+    puts report
+    messenger(report)
+    duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate").to_f*@weather_modifier.to_f
+    puts Time.now.localtime.to_s+" Using default watering settings for this zone."
     water_by_zone(i, duration)
-  elsif zone_moisture_level >=0 && zone_moisture_level <= 399
-    puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
-    duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
-    system("curl -k -X POST #{sleep_url}")
-    puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
-    water_by_zone(i, duration)
+  else
+    # note - will need to target specific zones for their moisture.
+    puts Time.now.localtime.to_s+" soil moisture is currently at "+zone_moisture_level.to_s
+    if zone_moisture_level >= 700 && zone_moisture_level <= 1100
+      report = Time.now.localtime.to_s+" Ground is moist. No water is needed"
+      puts report
+      messenger(report)
+    elsif zone_moisture_level >= 400 && zone_moisture_level <= 699
+      report = Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
+      puts report
+      messenger(report)
+      duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
+      water_by_zone(i, duration)
+    elsif zone_moisture_level >=0 && zone_moisture_level <= 399
+      report = Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
+      puts report
+      messenger(report)
+      duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
+      water_by_zone(i, duration)
+    end
   end
 end
 
@@ -221,9 +222,6 @@ def messenger(report)
   res.verify_mode = OpenSSL::SSL::VERIFY_PEER
   res.start {|http| http.request(req) }
 
-  if ENV['PUSHOVER_APP_TOKEN'] != nil
-    puts Time.now.localtime.to_s+" notified iOS application successfully"
-  end
 end
 
 def notify
@@ -231,15 +229,10 @@ def notify
   messenger(report)
 end
 
-def sleep_for_remainder_of_hour
-  current_time = Time.now
-  remainder_of_hour = (59-Time.now.min)*60
-  system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{remainder_of_hour}?access_token=#{ENV['WIO_TOKEN']}")
-  puts Time.now.localtime.to_s+" Have put system to sleep for the "+remainder_of_hour.to_s+"seconds remaining in the hour"
-end
-
 # ================ RUN SCRIPTS ===============
 puts "\n\n Today's weather report \n\n\n"
+
+@weather_modifier = 1
 retrieve_weather_data
 if @auto_water == true
   puts Time.now.localtime.to_s+" Calculating auto-water logic for each zone"
@@ -266,7 +259,3 @@ else
     water_by_zone(i, duration)
   end
 end
-
-sleep_for_remainder_of_hour
-
-puts "\n\n Running Reports \n\n\n"
