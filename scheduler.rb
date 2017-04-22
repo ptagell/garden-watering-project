@@ -115,14 +115,18 @@ def retrieve_weather_data
 end
 
 def retrieve_soil_moisture_data(i)
+  wio_token = "ZONE_"+i.to_s+"_WIO_TOKEN"
+  now = DateTime.now
+  target_time = DateTime.new(now.year, now.month, now.day, now.hour+3, 59, 50, now.zone)
+  sleep_duration = ((target_time-now)*24*60*60).to_i
 
-  sensor_url = "https://us.wio.seeed.io/v1/node/GroveMoistureA0/moisture?access_token=#{ENV['WIO_TOKEN']}"
+  sensor_url = "https://us.wio.seeed.io/v1/node/GroveMoistureA0/moisture?access_token=#{ENV[wio_token]}"
+  sleep_url = "https://us.wio.seeed.io/v1/node/pm/sleep/#{sleep_duration}?access_token=#{ENV[wio_token]}"
+
   open(sensor_url) do |f|
     json_string = f.read
     @moisture_data = JSON.parse(json_string)
   end
-
-  # Put Wio node sensor to sleep for
 
   zone_moisture_level = @moisture_data['moisture'].to_i
   # note - will need to target specific zones for their moisture.
@@ -130,17 +134,16 @@ def retrieve_soil_moisture_data(i)
   if zone_moisture_level >= 700 && zone_moisture_level <= 1100
     puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
   elsif zone_moisture_level >= 400 && zone_moisture_level <= 699
+    system("curl -k -X POST #{sleep_url}")
     puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
     duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
-    sleep_duration = duration-10.to_i
-    system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{duration.to_i-10}?access_token=#{ENV['WIO_TOKEN']}")
+    system("curl -k -X POST #{sleep_url}")
     puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
     water_by_zone(i, duration)
   elsif zone_moisture_level >=0 && zone_moisture_level <= 399
     puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
     duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
-    sleep_duration = duration-10.to_i
-    system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{duration.to_i-10}?access_token=#{ENV['WIO_TOKEN']}")
+    system("curl -k -X POST #{sleep_url}")
     puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
     water_by_zone(i, duration)
   end

@@ -233,3 +233,9 @@ eg. Running three zones, one after the other starting at 5:01am. Zone one first 
 ```
 01 5 * * * cd /home/pi/Projects/garden && /home/pi/.rvm/wrappers/ruby-2.3.0@garden/ruby /home/pi/Projects/garden/scheduler.rb 1200 500 600 >> /tmp/cron_output
 ```
+
+
+TODOS:
+
+- [ ] Make it so that sensor reports when batteries dies and sends a push notification to replace.
+- [x] Make it so that there can be multiple moisture sensors.
