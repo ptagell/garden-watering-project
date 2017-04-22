@@ -14,7 +14,7 @@ unless now.hour == target_time.hour+1
   else
     sleep_duration = seconds_till_target_time
   end
-  system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{sleep_duration}?access_token=#{ENV['WIO_TOKEN']}")
+  system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{sleep_duration}?access_token=#{ENV['ZONE_1_WIO_TOKEN']}")
   puts Time.now.localtime.to_s+" Have put system to sleep for "+sleep_duration.to_s+" seconds."
 else
   puts Time.now.localtime.to_s+" Rise and shine. Ready to water."

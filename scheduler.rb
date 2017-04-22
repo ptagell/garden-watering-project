@@ -127,16 +127,16 @@ def retrieve_soil_moisture_data(i)
   zone_moisture_level = @moisture_data['moisture'].to_i
   # note - will need to target specific zones for their moisture.
   puts Time.now.localtime.to_s+" soil moisture is currently at "+zone_moisture_level.to_s
-  if zone_moisture_level >= 200 && zone_moisture_level <= 900
+  if zone_moisture_level >= 700 && zone_moisture_level <= 1100
     puts Time.now.localtime.to_s+" Ground is moist. No water is needed"
-  elsif zone_moisture_level >= 100 && zone_moisture_level <= 199
+  elsif zone_moisture_level >= 400 && zone_moisture_level <= 699
     puts Time.now.localtime.to_s+" Ground is relatively moist. Only a light watering is needed."
     duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*0.75
     sleep_duration = duration-10.to_i
     system("curl -k -X POST https://us.wio.seeed.io/v1/node/pm/sleep/#{duration.to_i-10}?access_token=#{ENV['WIO_TOKEN']}")
     puts Time.now.localtime.to_s+" Putting soil moisture sensor to sleep for "+sleep_duration.to_s
     water_by_zone(i, duration)
-  elsif zone_moisture_level >=0 && zone_moisture_level <= 99
+  elsif zone_moisture_level >=0 && zone_moisture_level <= 399
     puts Time.now.localtime.to_s+" Ground is dry. Heavy watering required."
     duration = instance_variable_get("@zone_"+i.to_s+"_full_water_rate")*@weather_modifier*1.0
     sleep_duration = duration-10.to_i
