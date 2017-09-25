@@ -6,16 +6,11 @@ import time
 import grovepi
 
 # Connect the Grove Relay to digital port D5.
-relay = 5
+relay = 6
 
 grovepi.pinMode(relay,"OUTPUT")
 
 # switch off for 5 seconds
 print ("Ending...turning off water")
-grovepi.digitalWrite(relay,0)
-print ("Water is off")
-
-relay = 6
-
-grovepi.pinMode(relay,"OUTPUT")
-grovepi.digitalWrite(relay,0)
+grovepi.digitalWrite(relay,1)
+print ("Water is on")

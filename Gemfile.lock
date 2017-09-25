@@ -1,16 +1,20 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    curb (0.9.4)
     dotenv (2.1.2)
+    json (2.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  curb
   dotenv
+  json
 
 RUBY VERSION
-   ruby 2.3.0p0
+   ruby 2.4.1p111
 
 BUNDLED WITH
-   1.14.3
+   1.15.4

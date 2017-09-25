@@ -1,4 +1,5 @@
 # required to push notifications
+require 'rubygems'
 require "net/https"
 # required to access .env variables
 require 'dotenv/load'
